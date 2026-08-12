@@ -1,9 +1,8 @@
 ---
-title: 今年讀完 12 本書
+title: 讀gpe
 term: short
-status: todo
+status: doing
 order: 2
 target_date: 2026-12-31
 ---
-
-一個月一本,讀完寫一篇心得。
+練習coding能力
