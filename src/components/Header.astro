@@ -6,7 +6,8 @@ const path = Astro.url.pathname;
 // 判斷目前頁面,標記 active
 function isActive(href: string) {
   if (href === '/') return path === '/';
-  return path === href || path.startsWith(href + '/');
+  // href 已帶結尾斜線(如 /goals/),所以 startsWith 就能同時涵蓋列表頁與其下的詳情頁
+  return path === href || path.startsWith(href);
 }
 ---
 

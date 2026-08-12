@@ -34,7 +34,7 @@ function fmt(d?: Date) {
         <ul class="goals">
           {shortGoals.map((g) => (
             <li>
-              <a href={`/goals/${g.id}`} class={g.data.status === 'done' ? 'done' : ''}>
+              <a href={`/goals/${g.id}/`} class={g.data.status === 'done' ? 'done' : ''}>
                 <span class={`badge badge-${g.data.status}`}>{statusLabel[g.data.status]}</span>
                 <span class="body">
                   <span class="text">{g.data.title}</span>
@@ -56,7 +56,7 @@ function fmt(d?: Date) {
         <ul class="goals">
           {longGoals.map((g) => (
             <li>
-              <a href={`/goals/${g.id}`} class={g.data.status === 'done' ? 'done' : ''}>
+              <a href={`/goals/${g.id}/`} class={g.data.status === 'done' ? 'done' : ''}>
                 <span class={`badge badge-${g.data.status}`}>{statusLabel[g.data.status]}</span>
                 <span class="body">
                   <span class="text">{g.data.title}</span>

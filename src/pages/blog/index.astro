@@ -17,7 +17,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
       <div class="stack">
         {posts.map((p) => (
           <PostCard
-            href={`/blog/${p.id}`}
+            href={`/blog/${p.id}/`}
             title={p.data.title}
             date={p.data.date}
             summary={p.data.summary}

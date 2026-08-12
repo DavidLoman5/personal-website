@@ -13,9 +13,10 @@ export const SITE = {
 
 // 導覽列項目
 export const NAV_LINKS = [
+  // 結尾的斜線是刻意的 —— 頁面實際位置就是 /goals/,少了它每次點擊都要多吃一次轉址
   { href: '/', label: 'Home' },
-  { href: '/goals', label: 'Goals' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/projects', label: 'Projects' },
-  { href: '/about', label: 'About' },
+  { href: '/goals/', label: 'Goals' },
+  { href: '/blog/', label: 'Blog' },
+  { href: '/projects/', label: 'Projects' },
+  { href: '/about/', label: 'About' },
 ];

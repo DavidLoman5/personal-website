@@ -34,13 +34,88 @@ npm run preview  # 預覽 build 後的結果
 
 你可以直接編輯這些檔案,也可以用下面的後台編輯器。內容欄位的規則定義在 `src/content.config.ts`。
 
-## 後台編輯器(在網站上直接發文)
+## 怎麼寫一篇新文章
 
-後台使用 [Decap CMS](https://decapcms.org/)(繁體中文介面)。到 **<https://davidloman.netlify.app/admin>**,用 GitHub 帳號登入,就能用圖形介面寫文章、插圖、按存檔即發布 —— 不需要碰程式碼。
+有兩種方式,結果完全一樣(都是在 `src/content/` 產生一個 Markdown 檔)。**平常建議用方法 A。**
 
-發文流程:在 `/admin` 存檔 → Decap 把 Markdown 提交到 GitHub → Netlify 偵測到更新 → 自動重新建置並上線(約 1~2 分鐘)。
+### 方法 A:在網站後台寫(推薦,不用碰程式碼)
 
-後台設定檔在 `public/admin/config.yml`。上傳的圖片會存到 `public/uploads/`。
+1. 打開 **<https://davidloman.netlify.app/admin>**,用 GitHub 帳號登入。
+2. 左側選 **心得**(或 目標 / 作品),按 **New 心得**。
+3. 填標題、日期、內文。要插圖就按圖片欄位上傳,圖片會自動存到 `public/uploads/`。
+4. 按 **Publish → Publish now**。
+
+按下去之後會自己跑完:Decap 把 Markdown 提交到 GitHub → Netlify 偵測到更新 → 重新建置上線。**大約 1~2 分鐘後重新整理就會看到。**
+
+> 沒馬上看到是正常的,頁面有 30 秒的瀏覽器快取。重新整理(Ctrl+F5)就會立刻拿到最新版。
+
+### 方法 B:在電腦上直接寫檔案
+
+在 `src/content/blog/` 新增一個 `.md` 檔,檔名就是網址(例如 `my-first-post.md` → `/blog/my-first-post/`)。開頭那段 `---` 包起來的是欄位設定,下面才是內文:
+
+```markdown
+---
+title: 我的第一篇文章
+date: 2026-08-12
+summary: 一句話簡介,會顯示在文章列表上
+tags: ['隨筆', '學習']
+draft: false
+---
+
+這裡開始寫內文,用一般的 Markdown 語法就好。
+
+## 這是小標題
+
+- 條列一
+- 條列二
+```
+
+寫完 `npm run dev` 看一下,沒問題就 `git push`,Netlify 會自動部署。
+
+### 各區塊可以填的欄位
+
+欄位規則定義在 `src/content.config.ts`,填錯建置會失敗並告訴你哪裡錯。日期一律用 `YYYY-MM-DD`。
+
+**心得 Blog**(`src/content/blog/`)
+
+| 欄位      | 必填 | 說明                                    |
+| --------- | ---- | --------------------------------------- |
+| `title`   | ✅   | 標題                                    |
+| `date`    | ✅   | 發布日期                                |
+| `summary` |      | 列表上顯示的一句話簡介                  |
+| `tags`    |      | 標籤陣列,如 `['隨筆']`                 |
+| `cover`   |      | 封面圖路徑,如 `/uploads/xxx.jpg`       |
+| `draft`   |      | 設 `true` 就是草稿,不會出現在網站上    |
+
+**目標 Goals**(`src/content/goals/`)
+
+| 欄位          | 必填 | 說明                                        |
+| ------------- | ---- | ------------------------------------------- |
+| `title`       | ✅   | 目標名稱                                    |
+| `term`        |      | `short` 短期 / `long` 長期(預設 `short`)  |
+| `status`      |      | `todo` / `doing` / `done`(預設 `todo`)    |
+| `order`       |      | 數字,越小越前面                            |
+| `target_date` |      | 預計完成日                                  |
+
+> 首頁只會顯示**還沒完成**的目標;完成的改成 `done` 後仍會留在 `/goals/` 頁面。
+
+**作品 Projects**(`src/content/projects/`)
+
+| 欄位      | 必填 | 說明                     |
+| --------- | ---- | ------------------------ |
+| `title`   | ✅   | 作品名稱                 |
+| `date`    | ✅   | 日期                     |
+| `summary` |      | 簡介                     |
+| `tags`    |      | 標籤陣列                 |
+| `cover`   |      | 封面圖                   |
+| `link`    |      | 專案連結(外部網址)     |
+| `order`   |      | 數字,越小越前面         |
+
+### 關於後台
+
+後台使用 [Decap CMS](https://decapcms.org/)(繁體中文介面),設定檔在 `public/admin/config.yml`。
+
+⚠️ **要新增或修改欄位時,`src/content.config.ts` 和 `public/admin/config.yml` 兩邊都要改**,否則後台存的資料網站會讀不到。
 
 ## 想改網站標題、自介、社群連結?
 

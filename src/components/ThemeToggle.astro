@@ -57,7 +57,10 @@
   btn?.addEventListener('click', () => {
     const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     root.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
+    // 同上:無痕模式寫不進去也不該讓切換失效,主題本身仍要正常換
+    try {
+      localStorage.setItem('theme', next);
+    } catch (e) {}
     syncPressed();
   });
 </script>

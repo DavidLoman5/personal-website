@@ -26,15 +26,14 @@ import { Content, frontmatter } from '../content/about.md';
     </div>
   </div>
 
-  <div class="contact">
-    {SITE.email && <a href={`mailto:${SITE.email}`} class="card">✉️ {SITE.email}</a>}
-    {SITE.github && <a href={SITE.github} target="_blank" rel="noopener" class="card">🐙 GitHub</a>}
-  </div>
 </BaseLayout>
 
 <style>
   .about {
     margin-top: 1rem;
+    /* 照片是 float: right,原本靠下方的聯絡卡片 clear:both 收尾;
+       卡片移除後改用 flow-root 自己包住浮動,免得溢出到 footer */
+    display: flow-root;
   }
   .photo {
     width: 140px;
@@ -46,15 +45,5 @@ import { Content, frontmatter } from '../content/about.md';
   }
   .prose :global(h2) {
     margin-top: 2rem;
-  }
-  .contact {
-    clear: both;
-    margin-top: 2.5rem;
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-  .contact .card {
-    color: var(--text);
   }
 </style>

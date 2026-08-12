@@ -22,14 +22,14 @@ const statusLabel = { todo: 'To do', doing: 'In progress', done: 'Done' };
   <section>
     <div class="section-head">
       <h2>Goals</h2>
-      <a href="/goals">View all →</a>
+      <a href="/goals/">View all →</a>
     </div>
     {
       goals.length > 0 ? (
         <ul class="goal-list">
           {goals.map((g) => (
             <li>
-              <a href={`/goals/${g.id}`}>
+              <a href={`/goals/${g.id}/`}>
                 <span class={`badge badge-${g.data.status}`}>{statusLabel[g.data.status]}</span>
                 <span class="text">{g.data.title}</span>
                 <span class="arrow">→</span>
