@@ -1,14 +1,13 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import EditButton from '../../components/EditButton.astro';
+import TagList from '../../components/TagList.astro';
+import { getProjects } from '../../lib/content';
 
-const projects = (await getCollection('projects')).sort(
-  (a, b) => a.data.order - b.data.order || b.data.date.getTime() - a.data.date.getTime()
-);
+const projects = await getProjects();
 ---
 
-<BaseLayout title="Projects">
+<BaseLayout title="Projects" description="Felix 做過的專案與作品。" wide>
   <div class="page-head">
     <h1 class="page-title">Projects</h1>
     <EditButton collection="projects" label="作品" />
@@ -19,11 +18,11 @@ const projects = (await getCollection('projects')).sort(
     projects.length > 0 ? (
       <div class="grid">
         {projects.map((p, i) => (
-          <div class="card project">
+          <article class="card project reveal">
             {p.data.cover && (
               <img
                 src={p.data.cover}
-                alt={p.data.title}
+                alt={p.data.cover_alt ?? ''}
                 class="cover"
                 width="800"
                 height="450"
@@ -31,28 +30,25 @@ const projects = (await getCollection('projects')).sort(
                 decoding="async"
               />
             )}
-            <h3>{p.data.title}</h3>
-            {p.data.summary && <p class="muted">{p.data.summary}</p>}
-            {p.data.tags.length > 0 && (
-              <div class="tags">
-                {p.data.tags.map((t) => (
-                  <span class="tag">#{t}</span>
-                ))}
-              </div>
-            )}
+            {/* 標題連結撐開整張卡的點擊範圍;卡片內還有別的連結,不能直接包一層 <a> */}
+            <h2 class="title">
+              <a href={`/projects/${p.id}/`}>{p.data.title}</a>
+            </h2>
+            {p.data.summary && <p class="muted summary">{p.data.summary}</p>}
+            <TagList tags={p.data.tags} />
             <div class="card-foot">
               {p.data.link && (
                 <a href={p.data.link} target="_blank" rel="noopener" class="link">
-                  查看專案 →
+                  外部連結 ↗
                 </a>
               )}
               <EditButton collection="projects" entry={p.id} label={p.data.title} />
             </div>
-          </div>
+          </article>
         ))}
       </div>
     ) : (
-      <p class="muted">還沒有作品,到 <code>/admin</code> 新增吧!</p>
+      <p class="muted">還沒有作品,敬請期待。</p>
     )
   }
 </BaseLayout>
@@ -60,31 +56,49 @@ const projects = (await getCollection('projects')).sort(
 <style>
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1.2rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-5);
   }
-  .project .cover {
+  .project {
+    display: flex;
+    flex-direction: column;
+  }
+  .cover {
     width: 100%;
     aspect-ratio: 16 / 9;
     object-fit: cover;
-    margin-bottom: 0.8rem;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-3);
   }
-  .project h3 {
-    margin: 0 0 0.3rem;
+  .title {
+    margin: 0;
+    font-size: var(--text-lg);
   }
-  .tags {
-    margin-top: 0.7rem;
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
+  .title a {
+    color: var(--text);
+  }
+  .title a:hover {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+  .summary {
+    margin: var(--space-2) 0 0;
   }
   .card-foot {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.8rem;
+    gap: var(--space-3);
     flex-wrap: wrap;
-    margin-top: 0.9rem;
+    /* 把頁尾推到卡片底部,高矮不一的卡片才對得齊 */
+    margin-top: auto;
+    padding-top: var(--space-4);
   }
   /* 沒有外部連結時,編輯鈕自己靠右 */
   .card-foot :global(.edit-btn:only-child) {
@@ -93,5 +107,9 @@ const projects = (await getCollection('projects')).sort(
   .link {
     display: inline-block;
     font-weight: 600;
+    font-size: var(--text-sm);
+    /* 浮在整張卡的覆蓋層之上,才點得到自己 */
+    position: relative;
+    z-index: 1;
   }
 </style>

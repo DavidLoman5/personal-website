@@ -1,0 +1,46 @@
+---
+import { render } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+import { getProjects } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+---
+
+<PostLayout
+  title={project.data.title}
+  date={project.data.date}
+  tags={project.data.tags}
+  summary={project.data.summary}
+  cover={project.data.cover}
+  coverAlt={project.data.cover_alt}
+  back={{ href: '/projects/', label: 'Projects' }}
+  collection="projects"
+  editEntry={project.id}
+>
+  {
+    project.data.link && (
+      <p slot="meta" class="ext">
+        <a href={project.data.link} target="_blank" rel="noopener" class="btn">
+          前往專案 ↗
+        </a>
+      </p>
+    )
+  }
+
+  <Content />
+</PostLayout>
+
+<style>
+  .ext {
+    margin: var(--space-4) 0 0;
+  }
+</style>

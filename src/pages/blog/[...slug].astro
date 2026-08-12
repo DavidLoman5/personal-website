@@ -1,17 +1,28 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
+import { getPosts } from '../../lib/content';
+import { readingTime } from '../../lib/format';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog', ({ data }) => !data.draft);
-  return posts.map((post) => ({
+  // 已經是新到舊排序,直接拿相鄰的兩篇當上一篇/下一篇
+  const posts = await getPosts();
+  return posts.map((post, i) => ({
     params: { slug: post.id },
-    props: { post },
+    props: {
+      post,
+      // 陣列上一個是「比較新的」,對讀者來說是下一篇
+      newer: posts[i - 1],
+      older: posts[i + 1],
+    },
   }));
 }
 
-const { post } = Astro.props;
+const { post, newer, older } = Astro.props;
 const { Content } = await render(post);
+
+const link = (p?: typeof post) =>
+  p ? { href: `/blog/${p.id}/`, title: p.data.title } : undefined;
 ---
 
 <PostLayout
@@ -20,7 +31,13 @@ const { Content } = await render(post);
   tags={post.data.tags}
   summary={post.data.summary}
   cover={post.data.cover}
+  coverAlt={post.data.cover_alt}
+  back={{ href: '/blog/', label: 'Blog' }}
+  collection="blog"
   editEntry={post.id}
+  minutes={readingTime(post.body ?? '')}
+  prev={link(older)}
+  next={link(newer)}
 >
   <Content />
 </PostLayout>

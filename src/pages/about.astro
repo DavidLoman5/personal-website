@@ -3,23 +3,27 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import EditButton from '../components/EditButton.astro';
 import { SITE } from '../config';
 import { Content, frontmatter } from '../content/about.md';
+
+// 後台把欄位清空存的是 "",不是拿掉欄位 —— ?? 接不住空字串,會渲染出一個空標題
+const heading = frontmatter.title?.trim() || 'About';
+const photo = frontmatter.photo?.trim();
 ---
 
-<BaseLayout title="關於我">
+<BaseLayout title={heading} description={`關於 ${SITE.author}。`}>
   <div class="page-head">
-    <h1 class="page-title">{frontmatter.title ?? 'About'}</h1>
+    <h1 class="page-title">{heading}</h1>
     <EditButton collection="pages" entry="about" label="關於我" />
   </div>
 
   <div class="about">
     {
-      frontmatter.photo && (
+      photo && (
         <img
-          src={frontmatter.photo}
-          alt={SITE.author}
+          src={photo}
+          alt={`${SITE.author} 的照片`}
           class="photo"
-          width="140"
-          height="140"
+          width="160"
+          height="160"
           loading="lazy"
           decoding="async"
         />
@@ -30,24 +34,49 @@ import { Content, frontmatter } from '../content/about.md';
     </div>
   </div>
 
+  <div class="contact">
+    {SITE.email && <a class="btn" href={`mailto:${SITE.email}`}>寄信給我</a>}
+    {
+      SITE.github && (
+        <a class="btn" href={SITE.github} target="_blank" rel="noopener">
+          GitHub ↗
+        </a>
+      )
+    }
+  </div>
 </BaseLayout>
 
 <style>
+  /* 照片與內文並排,窄螢幕自動堆疊 —— 比原本的 float 好控制,
+     內文也不會在照片下方被卡出一塊奇怪的縮排 */
   .about {
-    margin-top: 1rem;
-    /* 照片是 float: right,原本靠下方的聯絡卡片 clear:both 收尾;
-       卡片移除後改用 flow-root 自己包住浮動,免得溢出到 footer */
-    display: flow-root;
+    margin-top: var(--space-4);
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: var(--space-6);
+    align-items: start;
+  }
+  /* 沒有照片時不要留一欄空格 */
+  .about:not(:has(.photo)) {
+    grid-template-columns: 1fr;
+  }
+  @media (max-width: 560px) {
+    .about {
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
   }
   .photo {
-    width: 140px;
-    height: 140px;
+    width: 160px;
+    height: 160px;
     object-fit: cover;
     border-radius: 50%;
-    float: right;
-    margin: 0 0 1rem 1.5rem;
+    border: 1px solid var(--border);
   }
-  .prose :global(h2) {
-    margin-top: 2rem;
+  .contact {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-top: var(--space-7);
   }
 </style>

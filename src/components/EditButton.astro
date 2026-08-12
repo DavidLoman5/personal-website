@@ -15,7 +15,14 @@ const action = entry ? '編輯' : '新增';
 const aria = label ? `${action}:${label}` : action;
 ---
 
-<a class="edit-btn" href={href} rel="nofollow" aria-label={aria}>{action}</a>
+{/* prefetch 要關掉 —— 全站是 prefetchAll,不然每個進入視窗的編輯鈕都會對 /admin/ 發一次沒用的請求 */}
+<a
+  class="edit-btn"
+  href={href}
+  rel="nofollow"
+  aria-label={aria}
+  data-astro-prefetch="false">{action}</a
+>
 
 <style>
   /* 這顆按鈕只有站長自己用得到,所以平常隱形 —— 滑到所在區塊才淡淡浮現。
@@ -25,13 +32,16 @@ const aria = label ? `${action}:${label}` : action;
     align-items: center;
     /* 44px 的觸控目標對這顆次要按鈕太大,36px 是不誤觸的下限 */
     min-height: 36px;
-    padding: 0.25rem 0.4rem;
+    padding: var(--space-1) var(--space-2);
     color: var(--text-soft);
-    font-size: 0.78rem;
+    font-size: var(--text-xs);
     line-height: 1;
     white-space: nowrap;
+    /* 卡片整張可點時要浮在覆蓋層之上,否則點到的會是卡片本身 */
+    position: relative;
+    z-index: 1;
     opacity: 0;
-    transition: opacity 0.15s ease, color 0.15s ease;
+    transition: opacity var(--transition-fast), color var(--transition-fast);
   }
 
   /* 浮現條件:所在區塊被滑過、自己被滑過、或鍵盤聚焦。
@@ -49,10 +59,11 @@ const aria = label ? `${action}:${label}` : action;
     text-decoration: underline;
   }
 
-  /* 觸控裝置沒有 hover,永遠隱形就等於點不到 —— 改成淡淡地常駐 */
+  /* 觸控裝置沒有 hover,永遠隱形就等於點不到 —— 常駐顯示。
+     不用降透明度矇混,那只會讓文字對比掉到讀不清楚。 */
   @media (hover: none) {
     .edit-btn {
-      opacity: 0.4;
+      opacity: 1;
     }
   }
 </style>

@@ -1,50 +1,61 @@
 ---
 // 文章 / 作品的卡片
+import TagList from './TagList.astro';
+import { formatDate, isoDate } from '../lib/format';
+
 interface Props {
   href: string;
   title: string;
   date?: Date;
   summary?: string;
   tags?: string[];
+  /** 幾分鐘讀完;沒給就不顯示 */
+  minutes?: number;
 }
-const { href, title, date, summary, tags = [] } = Astro.props;
-
-const dateStr = date
-  ? date.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' })
-  : '';
+const { href, title, date, summary, tags = [], minutes } = Astro.props;
 ---
 
-<a href={href} class="card post-card">
-  <h3>{title}</h3>
-  {dateStr && <time class="muted date">{dateStr}</time>}
+{/* 標籤本身是連結,所以整張卡不能再包一層 <a> —— 改用標題連結撐開整張卡的點擊範圍 */}
+<article class="card post-card">
+  <h2 class="title"><a href={href}>{title}</a></h2>
+  <p class="meta">
+    {date && <time datetime={isoDate(date)}>{formatDate(date)}</time>}
+    {date && minutes && <span aria-hidden="true">·</span>}
+    {minutes && <span>{minutes} 分鐘讀完</span>}
+  </p>
   {summary && <p class="summary">{summary}</p>}
-  {
-    tags.length > 0 && (
-      <div class="tags">
-        {tags.map((t) => (
-          <span class="tag">#{t}</span>
-        ))}
-      </div>
-    )
-  }
-</a>
+  <TagList tags={tags} />
+</article>
 
 <style>
-  .post-card h3 {
-    margin: 0 0 0.2rem;
+  .title {
+    margin: 0;
+    font-size: var(--text-xl);
+  }
+  .title a {
     color: var(--text);
   }
-  .date {
-    font-size: 0.85rem;
+  .title a:hover {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  /* 讓整張卡都能點到標題連結 */
+  .title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+  .meta {
+    margin: var(--space-1) 0 0;
+    font-size: var(--text-sm);
+    color: var(--text-soft);
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
   }
   .summary {
-    margin: 0.6rem 0 0;
+    margin: var(--space-3) 0 0;
     color: var(--text-soft);
-  }
-  .tags {
-    margin-top: 0.8rem;
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
   }
 </style>

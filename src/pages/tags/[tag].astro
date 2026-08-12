@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getTagMap, type TaggedEntry } from '../../lib/content';
+import { readingTime } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const tagMap = await getTagMap();
+  return [...tagMap.entries()].map(([tag, items]) => ({
+    params: { tag },
+    props: { tag, items },
+  }));
+}
+
+interface Props {
+  tag: string;
+  items: TaggedEntry[];
+}
+const { tag, items } = Astro.props;
+
+// 文章在前、作品在後,各自新到舊
+const sorted = [...items].sort(
+  (a, b) =>
+    (a.kind === b.kind ? 0 : a.kind === 'post' ? -1 : 1) ||
+    b.entry.data.date.getTime() - a.entry.data.date.getTime(),
+);
+---
+
+<BaseLayout
+  title={`#${tag}`}
+  description={`標籤 ${tag} 底下的文章與作品,共 ${items.length} 篇。`}
+>
+  <p class="crumb"><a href="/tags/">← 回到所有標籤</a></p>
+  <h1 class="page-title">#{tag}</h1>
+  <p class="page-intro">共 {items.length} 篇。</p>
+
+  <div class="stack">
+    {
+      sorted.map(({ kind, entry }) => (
+        <PostCard
+          href={kind === 'post' ? `/blog/${entry.id}/` : `/projects/${entry.id}/`}
+          title={entry.data.title}
+          date={entry.data.date}
+          summary={entry.data.summary}
+          tags={entry.data.tags}
+          minutes={kind === 'post' ? readingTime(entry.body ?? '') : undefined}
+        />
+      ))
+    }
+  </div>
+</BaseLayout>
+
+<style>
+  .crumb {
+    margin: var(--space-6) 0 0;
+    font-size: var(--text-sm);
+  }
+  .page-title {
+    margin-top: var(--space-3);
+  }
+  .stack {
+    display: grid;
+    gap: var(--space-4);
+  }
+</style>

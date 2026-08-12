@@ -6,7 +6,7 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# 注意:網址是 /about 而不是 /about/index.html,所以規則要寫 /* 才吃得到。
+# 網址是 /about/ 而不是 /about/index.html,所以規則要寫 /* 才吃得到。
 # max-age=30 是刻意的 —— 預抓回來的頁面如果是 max-age=0,點下去瀏覽器還是要回源
 # 問一次「有沒有更新」(304),預抓就白做了。給 30 秒的新鮮期,點擊才是真正的零等待;
 # 代價是從 /admin 發文後最多 30 秒才會看到,重新整理則會立刻拿到新的。
@@ -16,6 +16,8 @@
     Cache-Control = "public, max-age=30, must-revalidate"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
 
 # 檔名帶 hash,可以永久快取
 [[headers]]
@@ -28,6 +30,18 @@
   for = "/uploads/*"
   [headers.values]
     Cache-Control = "public, max-age=86400"
+
+# RSS 與 sitemap 不需要 30 秒就過期,爬蟲本來就不會一直來
+[[headers]]
+  for = "/*.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+# 分享預覽圖:各家社群平台會自己抓一次存起來,給長一點的快取
+[[headers]]
+  for = "/og.png"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
 
 # 後台設定改了要立刻生效
 [[headers]]
