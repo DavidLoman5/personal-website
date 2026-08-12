@@ -12,30 +12,47 @@ const href = entry
   ? `/admin/#/collections/${collection}/entries/${entry}`
   : `/admin/#/collections/${collection}/new`;
 const action = entry ? '編輯' : '新增';
-const text = entry ? `✏️ ${action}` : `＋ ${action}`;
 const aria = label ? `${action}:${label}` : action;
 ---
 
-<a class="edit-btn" href={href} rel="nofollow" aria-label={aria}>{text}</a>
+<a class="edit-btn" href={href} rel="nofollow" aria-label={aria}>{action}</a>
 
 <style>
+  /* 這顆按鈕只有站長自己用得到,所以平常隱形 —— 滑到所在區塊才淡淡浮現。
+     用 opacity 而不是 display:none,浮現時版面才不會跳動。 */
   .edit-btn {
     display: inline-flex;
     align-items: center;
     /* 44px 的觸控目標對這顆次要按鈕太大,36px 是不誤觸的下限 */
     min-height: 36px;
-    padding: 0.25rem 0.8rem;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: var(--surface);
+    padding: 0.25rem 0.4rem;
     color: var(--text-soft);
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     line-height: 1;
     white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.15s ease, color 0.15s ease;
+  }
+
+  /* 浮現條件:所在區塊被滑過、自己被滑過、或鍵盤聚焦。
+     容器 class 是頁面那邊的,要用 :global() 包起來才不會被 Astro 加上 scope。 */
+  :global(.page-head:hover) .edit-btn,
+  :global(.hero:hover) .edit-btn,
+  :global(.topbar:hover) .edit-btn,
+  :global(.card:hover) .edit-btn,
+  .edit-btn:hover,
+  .edit-btn:focus {
+    opacity: 1;
+    color: var(--accent);
   }
   .edit-btn:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-    text-decoration: none;
+    text-decoration: underline;
+  }
+
+  /* 觸控裝置沒有 hover,永遠隱形就等於點不到 —— 改成淡淡地常駐 */
+  @media (hover: none) {
+    .edit-btn {
+      opacity: 0.4;
+    }
   }
 </style>
