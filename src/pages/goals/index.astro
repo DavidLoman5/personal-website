@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import EditButton from '../../components/EditButton.astro';
 
 const all = await getCollection('goals');
 const statusRank = { doing: 0, todo: 1, done: 2 };
@@ -18,7 +19,10 @@ function fmt(d?: Date) {
 ---
 
 <BaseLayout title="Goals">
-  <h1 class="page-title">Goals</h1>
+  <div class="page-head">
+    <h1 class="page-title">Goals</h1>
+    <EditButton collection="goals" label="目標" />
+  </div>
   <p class="page-intro">我正在努力的短期與長期目標,點進去看細節。</p>
 
   {

@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import EditButton from '../../components/EditButton.astro';
 
 const projects = (await getCollection('projects')).sort(
   (a, b) => a.data.order - b.data.order || b.data.date.getTime() - a.data.date.getTime()
@@ -8,7 +9,10 @@ const projects = (await getCollection('projects')).sort(
 ---
 
 <BaseLayout title="Projects">
-  <h1 class="page-title">Projects</h1>
+  <div class="page-head">
+    <h1 class="page-title">Projects</h1>
+    <EditButton collection="projects" label="作品" />
+  </div>
   <p class="page-intro">我做過的專案與作品。</p>
 
   {
@@ -36,11 +40,14 @@ const projects = (await getCollection('projects')).sort(
                 ))}
               </div>
             )}
-            {p.data.link && (
-              <a href={p.data.link} target="_blank" rel="noopener" class="link">
-                查看專案 →
-              </a>
-            )}
+            <div class="card-foot">
+              {p.data.link && (
+                <a href={p.data.link} target="_blank" rel="noopener" class="link">
+                  查看專案 →
+                </a>
+              )}
+              <EditButton collection="projects" entry={p.id} label={p.data.title} />
+            </div>
           </div>
         ))}
       </div>
@@ -71,9 +78,20 @@ const projects = (await getCollection('projects')).sort(
     gap: 0.4rem;
     flex-wrap: wrap;
   }
+  .card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-top: 0.9rem;
+  }
+  /* 沒有外部連結時,編輯鈕自己靠右 */
+  .card-foot :global(.edit-btn:only-child) {
+    margin-left: auto;
+  }
   .link {
     display: inline-block;
-    margin-top: 0.9rem;
     font-weight: 600;
   }
 </style>

@@ -1,5 +1,6 @@
-# Sveltia CMS 設定檔（與 Decap CMS 相容）
+# Decap CMS 設定檔
 # 部署後、設定好 GitHub 登入,就能在「你的網址/admin」用 GitHub 帳號登入發文。
+# 網站各頁的「編輯」按鈕會直接連到這裡對應的項目,例如 /admin/#/collections/blog/entries/檔名
 
 backend:
   name: github
@@ -107,10 +108,15 @@ collections:
       - { name: order, label: 排序（數字小的在前）, widget: number, default: 0, value_type: int }
       - { name: body, label: 說明, widget: markdown, required: false }
 
-  # ---------- 關於我 / About（單一頁面） ----------
+  # ---------- 單一頁面（首頁封面、關於我） ----------
   - name: pages
     label: 頁面
     files:
+      - name: home
+        label: 首頁封面
+        file: src/content/home.md
+        fields:
+          - { name: quote, label: 名言, widget: text, hint: 顯示在首頁最上方的那句話 }
       - name: about
         label: 關於我
         file: src/content/about.md

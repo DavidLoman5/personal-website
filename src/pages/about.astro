@@ -1,11 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import EditButton from '../components/EditButton.astro';
 import { SITE } from '../config';
 import { Content, frontmatter } from '../content/about.md';
 ---
 
 <BaseLayout title="關於我">
-  <h1 class="page-title">{frontmatter.title ?? 'About'}</h1>
+  <div class="page-head">
+    <h1 class="page-title">{frontmatter.title ?? 'About'}</h1>
+    <EditButton collection="pages" entry="about" label="關於我" />
+  </div>
 
   <div class="about">
     {

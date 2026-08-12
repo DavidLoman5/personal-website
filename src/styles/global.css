@@ -195,6 +195,16 @@ a.card:active,
   margin-bottom: 2rem;
 }
 
+/* 頁面標題列:左邊標題,右邊「編輯 / 新增」按鈕。
+   跟 .section-head 一樣對齊基線,窄螢幕放不下就換行。 */
+.page-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 /* 使用者在系統開啟「減少動態效果」時,關掉所有位移與過場 */
 @media (prefers-reduced-motion: reduce) {
   *,

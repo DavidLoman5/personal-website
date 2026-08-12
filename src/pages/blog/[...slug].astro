@@ -20,6 +20,7 @@ const { Content } = await render(post);
   tags={post.data.tags}
   summary={post.data.summary}
   cover={post.data.cover}
+  editEntry={post.id}
 >
   <Content />
 </PostLayout>

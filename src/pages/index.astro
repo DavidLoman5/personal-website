@@ -1,7 +1,10 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import EditButton from '../components/EditButton.astro';
 import { SITE } from '../config';
+// 封面那句名言 —— 存在 src/content/home.md,可以從後台改
+import { frontmatter as home } from '../content/home.md';
 
 // 進行中 / 待辦的目標,取前 5 個
 const statusRank = { doing: 0, todo: 1, done: 2 };
@@ -15,8 +18,8 @@ const statusLabel = { todo: 'To do', doing: 'In progress', done: 'Done' };
 
 <BaseLayout>
   <section class="hero">
-    <h1>{SITE.title}</h1>
-    <p class="tagline">{SITE.tagline}</p>
+    <h1 class="quote">&ldquo;{home.quote ?? SITE.tagline}&rdquo;</h1>
+    <EditButton collection="pages" entry="home" label="首頁封面" />
   </section>
 
   <section>
@@ -46,16 +49,16 @@ const statusLabel = { todo: 'To do', doing: 'In progress', done: 'Done' };
 
 <style>
   .hero {
-    padding: 3rem 0 2.5rem;
+    padding: 4rem 0 3rem;
   }
-  .hero h1 {
-    font-size: 2.4rem;
-    margin: 0 0 0.6rem;
-  }
-  .tagline {
-    font-size: 1.15rem;
-    color: var(--text-soft);
-    margin: 0;
+  .quote {
+    /* 隨視窗縮放,窄螢幕不會撐破版面 */
+    font-size: clamp(1.9rem, 5vw, 2.9rem);
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin: 0 0 1.2rem;
+    /* 避免長句最後一行只剩一兩個字 */
+    text-wrap: balance;
   }
   section {
     margin-bottom: 2.8rem;

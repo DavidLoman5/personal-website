@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import EditButton from '../../components/EditButton.astro';
 
 export async function getStaticPaths() {
   const goals = await getCollection('goals');
@@ -23,7 +24,10 @@ const targetStr = goal.data.target_date
 
 <BaseLayout title={goal.data.title}>
   <article>
-    <a href="/goals/" class="back">← Back to Goals</a>
+    <div class="topbar">
+      <a href="/goals/" class="back">← Back to Goals</a>
+      <EditButton collection="goals" entry={goal.id} label={goal.data.title} />
+    </div>
     <h1 class={`title ${goal.data.status === 'done' ? 'done' : ''}`}>{goal.data.title}</h1>
 
     <div class="meta">
@@ -41,6 +45,12 @@ const targetStr = goal.data.target_date
 <style>
   article {
     margin-top: 2rem;
+  }
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
   }
   .back {
     font-size: 0.9rem;

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import EditButton from '../components/EditButton.astro';
 
 interface Props {
   title: string;
@@ -7,8 +8,10 @@ interface Props {
   tags?: string[];
   summary?: string;
   cover?: string;
+  // 這篇在後台的檔名;有給才會顯示「編輯」按鈕
+  editEntry?: string;
 }
-const { title, date, tags = [], summary, cover } = Astro.props;
+const { title, date, tags = [], summary, cover, editEntry } = Astro.props;
 
 const dateStr = date
   ? date.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -17,7 +20,10 @@ const dateStr = date
 
 <BaseLayout title={title} description={summary}>
   <article>
-    <a href="/blog/" class="back">← Back to Blog</a>
+    <div class="topbar">
+      <a href="/blog/" class="back">← Back to Blog</a>
+      {editEntry && <EditButton collection="blog" entry={editEntry} label={title} />}
+    </div>
     <h1 class="title">{title}</h1>
     {dateStr && <time class="muted">{dateStr}</time>}
     {
@@ -52,6 +58,12 @@ const dateStr = date
 <style>
   article {
     margin-top: 2rem;
+  }
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
   }
   .back {
     font-size: 0.9rem;

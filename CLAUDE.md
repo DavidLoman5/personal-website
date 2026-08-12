@@ -33,9 +33,10 @@ npm run preview    # 預覽 build 結果
 - `src/config.ts` —— 網站標題、自介、社群連結、導覽列。要改站名/自介先看這裡。
 - `src/content.config.ts` —— 內容集合(blog / goals / projects)的欄位 schema(Zod)。
 - `src/content/` —— 所有內容(Markdown):
-  - `blog/`、`goals/`、`projects/` 各是一個集合;`about.md` 是單一頁面(被 `src/pages/about.astro` 直接 import)。
+  - `blog/`、`goals/`、`projects/` 各是一個集合;`about.md`(關於我)和 `home.md`(首頁封面那句名言)是單一檔案,被對應頁面直接 import,**不是** collection,所以不用寫進 `content.config.ts`,只要在 `public/admin/config.yml` 的 `pages` 集合裡有對應項目。
 - `src/layouts/` —— `BaseLayout`(共用外框、含防閃爍的主題腳本)、`PostLayout`(單篇文章)。
-- `src/components/` —— `Header`、`Footer`、`ThemeToggle`、`PostCard`。
+- `src/components/` —— `Header`、`Footer`、`ThemeToggle`、`PostCard`、`EditButton`。
+  - `EditButton` 是全站每頁那顆「編輯 / 新增」按鈕,連到 `/admin/#/collections/<集合>/entries/<檔名>`(不給 `entry` 就是 `/new`)。**`entry` 一定要用內容的檔名(Astro 的 `entry.id`)**,才對得上後台的 slug。
 - `src/pages/` —— 路由。`blog/[...slug].astro` 與 `goals/[...slug].astro` 用 `getStaticPaths` 動態產生每篇/每個目標的詳情頁。
 - `public/admin/` —— 後台:`index.html`(載入 Decap CMS)、`config.yml`(集合與欄位定義,須與 `content.config.ts` 對齊)。
 - `public/uploads/` —— 後台上傳的圖片。
