@@ -10,8 +10,8 @@ backend:
 media_folder: public/uploads
 public_folder: /uploads
 
-# 介面語言
-locale: zh_TW
+# 後台介面語言（en = 英文,最穩定不會退回簡體）
+locale: en
 
 collections:
   # ---------- 心得 / Blog ----------
