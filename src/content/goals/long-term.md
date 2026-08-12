@@ -1,6 +1,6 @@
 ---
 title: 考TOEFL並拿到好成績
-term: long
+term: short
 status: doing
 order: 1
 target_date: ""
