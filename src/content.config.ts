@@ -1,6 +1,14 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
+// 後台把日期清空時,存下來的是空字串(target_date: "")而不是把欄位拿掉,
+// 直接丟給 z.coerce.date() 會變成 Invalid Date 讓整個 build 失敗。
+// 這裡把空值一律當成「沒填」。
+const optionalDate = z.preprocess(
+  (v) => (v === '' || v === null ? undefined : v),
+  z.coerce.date().optional(),
+);
+
 // 心得 / Blog 文章
 const blog = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
@@ -23,7 +31,7 @@ const goals = defineCollection({
     term: z.enum(['short', 'long']).default('short'),
     status: z.enum(['todo', 'doing', 'done']).default('todo'),
     order: z.number().default(0),
-    target_date: z.coerce.date().optional(),
+    target_date: optionalDate,
   }),
 });
 
