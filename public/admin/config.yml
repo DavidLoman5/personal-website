@@ -10,8 +10,8 @@ backend:
 media_folder: public/uploads
 public_folder: /uploads
 
-# 後台介面語言（en = 英文,最穩定不會退回簡體）
-locale: en
+# 後台介面語言（zh_Hant = 繁體中文;Decap CMS 有正式繁體翻譯）
+locale: zh_Hant
 
 collections:
   # ---------- 心得 / Blog ----------
