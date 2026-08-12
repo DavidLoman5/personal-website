@@ -8,7 +8,19 @@ import { Content, frontmatter } from '../content/about.md';
   <h1 class="page-title">{frontmatter.title ?? 'About'}</h1>
 
   <div class="about">
-    {frontmatter.photo && <img src={frontmatter.photo} alt={SITE.author} class="photo" />}
+    {
+      frontmatter.photo && (
+        <img
+          src={frontmatter.photo}
+          alt={SITE.author}
+          class="photo"
+          width="140"
+          height="140"
+          loading="lazy"
+          decoding="async"
+        />
+      )
+    }
     <div class="prose">
       <Content />
     </div>

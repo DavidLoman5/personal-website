@@ -16,7 +16,11 @@ function isActive(href: string) {
     <nav>
       {
         NAV_LINKS.map((link) => (
-          <a href={link.href} class={isActive(link.href) ? 'active' : ''}>
+          <a
+            href={link.href}
+            class={isActive(link.href) ? 'active' : ''}
+            aria-current={isActive(link.href) ? 'page' : undefined}
+          >
             {link.label}
           </a>
         ))
@@ -33,7 +37,6 @@ function isActive(href: string) {
     position: sticky;
     top: 0;
     z-index: 10;
-    backdrop-filter: blur(6px);
   }
   .inner {
     display: flex;
@@ -60,7 +63,11 @@ function isActive(href: string) {
   }
   nav a {
     color: var(--text-soft);
-    padding: 0.35rem 0.6rem;
+    /* 至少 44px 的點擊範圍,避免在手機上誤觸 */
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.55rem 0.7rem;
     border-radius: 8px;
     font-size: 0.95rem;
   }
@@ -68,6 +75,10 @@ function isActive(href: string) {
     color: var(--text);
     background: var(--bg-soft);
     text-decoration: none;
+  }
+  nav a:active {
+    transform: scale(0.985);
+    background: var(--bg-soft);
   }
   nav a.active {
     color: var(--accent);

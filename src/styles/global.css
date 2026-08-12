@@ -32,8 +32,10 @@
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {
@@ -43,7 +45,41 @@ body {
   color: var(--text);
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+/* 觸控裝置:不要等雙擊縮放判定 */
+a,
+button,
+summary,
+label {
+  touch-action: manipulation;
+}
+
+/* 鍵盤操作時才顯示的 focus 外框。
+   不要在這裡設 border-radius —— outline 本來就會沿著元素自己的圓角,
+   設了反而會在聚焦當下把卡片的形狀改掉。 */
+:where(a, button, summary, input, textarea, select):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* 跳到主要內容:平常藏起來,用 Tab 聚焦時才滑出 */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  color: var(--text);
+}
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+  text-decoration: none;
 }
 
 .container {
@@ -130,6 +166,22 @@ a.card:hover {
   text-decoration: none;
 }
 
+/* 按下去的即時回饋 —— 刻意把 transition 歸零,手指一按就要看到反應。
+   -webkit-tap-highlight-color 只加在「有自訂 :active 樣式」的元素上;
+   加在全部連結上的話,內文連結會失去系統預設的灰色回饋卻換不到東西。 */
+a.card,
+.goal-list a,
+.goals a {
+  -webkit-tap-highlight-color: transparent;
+}
+a.card:active,
+.goal-list a:active,
+.goals a:active {
+  transform: scale(0.985);
+  border-color: var(--accent);
+  transition-duration: 0s;
+}
+
 .muted {
   color: var(--text-soft);
 }
@@ -141,4 +193,18 @@ a.card:hover {
 .page-intro {
   color: var(--text-soft);
   margin-bottom: 2rem;
+}
+
+/* 使用者在系統開啟「減少動態效果」時,關掉所有位移與過場 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  a.card:hover {
+    transform: none;
+  }
 }

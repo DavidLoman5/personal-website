@@ -1,7 +1,12 @@
 ---
 // 深色/淺色切換按鈕
 ---
-<button id="theme-toggle" aria-label="切換深色/淺色模式" title="切換深色/淺色模式">
+<button
+  id="theme-toggle"
+  aria-label="切換深色/淺色模式"
+  title="切換深色/淺色模式"
+  aria-pressed="false"
+>
   <span class="icon-sun">☀️</span>
   <span class="icon-moon">🌙</span>
 </button>
@@ -11,6 +16,12 @@
     background: transparent;
     border: 1px solid var(--border);
     border-radius: 8px;
+    /* 至少 44x44 的點擊範圍 */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
     padding: 0.35rem 0.5rem;
     cursor: pointer;
     font-size: 1rem;
@@ -19,6 +30,10 @@
   }
   #theme-toggle:hover {
     border-color: var(--accent);
+  }
+  #theme-toggle:active {
+    transform: scale(0.94);
+    transition: none;
   }
   .icon-moon {
     display: none;
@@ -33,10 +48,16 @@
 
 <script>
   const btn = document.getElementById('theme-toggle');
+  const root = document.documentElement;
+
+  // 主題是在 <head> 的防閃爍腳本裡決定的,這裡補上按鈕的按下狀態給螢幕閱讀器
+  const syncPressed = () => btn?.setAttribute('aria-pressed', String(root.getAttribute('data-theme') === 'dark'));
+  syncPressed();
+
   btn?.addEventListener('click', () => {
-    const root = document.documentElement;
     const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     root.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
+    syncPressed();
   });
 </script>
