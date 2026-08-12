@@ -1,0 +1,69 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const projects = (await getCollection('projects')).sort(
+  (a, b) => a.data.order - b.data.order || b.data.date.getTime() - a.data.date.getTime()
+);
+---
+
+<BaseLayout title="Projects">
+  <h1 class="page-title">Projects</h1>
+  <p class="page-intro">我做過的專案與作品。</p>
+
+  {
+    projects.length > 0 ? (
+      <div class="grid">
+        {projects.map((p) => (
+          <div class="card project">
+            {p.data.cover && <img src={p.data.cover} alt={p.data.title} class="cover" />}
+            <h3>{p.data.title}</h3>
+            {p.data.summary && <p class="muted">{p.data.summary}</p>}
+            {p.data.tags.length > 0 && (
+              <div class="tags">
+                {p.data.tags.map((t) => (
+                  <span class="tag">#{t}</span>
+                ))}
+              </div>
+            )}
+            {p.data.link && (
+              <a href={p.data.link} target="_blank" rel="noopener" class="link">
+                查看專案 →
+              </a>
+            )}
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p class="muted">還沒有作品,到 <code>/admin</code> 新增吧!</p>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.2rem;
+  }
+  .project .cover {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    margin-bottom: 0.8rem;
+  }
+  .project h3 {
+    margin: 0 0 0.3rem;
+  }
+  .tags {
+    margin-top: 0.7rem;
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .link {
+    display: inline-block;
+    margin-top: 0.9rem;
+    font-weight: 600;
+  }
+</style>

@@ -1,0 +1,34 @@
+---
+import { SITE } from '../config';
+const year = new Date().getFullYear();
+---
+
+<footer>
+  <div class="container inner">
+    <span class="muted">© {year} {SITE.author}</span>
+    <span class="links">
+      {SITE.github && <a href={SITE.github} target="_blank" rel="noopener">GitHub</a>}
+      {SITE.email && <a href={`mailto:${SITE.email}`}>Email</a>}
+    </span>
+  </div>
+</footer>
+
+<style>
+  footer {
+    border-top: 1px solid var(--border);
+    margin-top: 4rem;
+    padding: 1.5rem 0;
+    font-size: 0.9rem;
+  }
+  .inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .links {
+    display: flex;
+    gap: 1rem;
+  }
+</style>

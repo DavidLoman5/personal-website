@@ -1,0 +1,81 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const goals = await getCollection('goals');
+  return goals.map((goal) => ({
+    params: { slug: goal.id },
+    props: { goal },
+  }));
+}
+
+const { goal } = Astro.props;
+const { Content } = await render(goal);
+
+const statusLabel = { todo: 'To do', doing: 'In progress', done: 'Done' };
+const termLabel = { short: 'Short-term', long: 'Long-term' };
+
+const targetStr = goal.data.target_date
+  ? goal.data.target_date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+  : '';
+---
+
+<BaseLayout title={goal.data.title}>
+  <article>
+    <a href="/goals" class="back">← Back to Goals</a>
+    <h1 class={`title ${goal.data.status === 'done' ? 'done' : ''}`}>{goal.data.title}</h1>
+
+    <div class="meta">
+      <span class="tag">{termLabel[goal.data.term]}</span>
+      <span class={`badge badge-${goal.data.status}`}>{statusLabel[goal.data.status]}</span>
+      {targetStr && <span class="muted">Target: {targetStr}</span>}
+    </div>
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  article {
+    margin-top: 2rem;
+  }
+  .back {
+    font-size: 0.9rem;
+  }
+  .title {
+    font-size: 2rem;
+    margin: 1rem 0 0.6rem;
+  }
+  .title.done {
+    text-decoration: line-through;
+    color: var(--text-soft);
+  }
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .prose {
+    margin-top: 1rem;
+  }
+  .badge {
+    font-size: 0.78rem;
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    color: #fff;
+  }
+  .badge-todo {
+    background: #8a8f98;
+  }
+  .badge-doing {
+    background: var(--accent);
+  }
+  .badge-done {
+    background: #4a8f6a;
+  }
+</style>

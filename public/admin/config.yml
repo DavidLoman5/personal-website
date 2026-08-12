@@ -1,0 +1,120 @@
+# Sveltia CMS 設定檔（與 Decap CMS 相容）
+# 部署後、設定好 GitHub 登入,就能在「你的網址/admin」用 GitHub 帳號登入發文。
+
+backend:
+  name: github
+  repo: DavidLoman5/personal-website # 之後若 repo 名稱不同,改這裡
+  branch: main
+
+# 後台上傳的圖片會存到這裡,網頁用 /uploads/... 引用
+media_folder: public/uploads
+public_folder: /uploads
+
+# 介面語言
+locale: zh_TW
+
+collections:
+  # ---------- 心得 / Blog ----------
+  - name: blog
+    label: 心得
+    label_singular: 心得
+    folder: src/content/blog
+    create: true
+    slug: '{{slug}}'
+    summary: '{{title}}'
+    sortable_fields: [date, title]
+    fields:
+      - { name: title, label: 標題, widget: string }
+      - {
+          name: date,
+          label: 日期,
+          widget: datetime,
+          format: 'YYYY-MM-DD',
+          date_format: 'YYYY-MM-DD',
+          time_format: false,
+        }
+      - { name: summary, label: 摘要, widget: text, required: false, hint: 顯示在列表上的一兩句話 }
+      - { name: tags, label: 標籤, widget: list, required: false, default: [] }
+      - { name: cover, label: 封面圖, widget: image, required: false }
+      - { name: draft, label: 草稿（勾選則不公開）, widget: boolean, default: false }
+      - { name: body, label: 內文, widget: markdown }
+
+  # ---------- 目標 / Goals ----------
+  - name: goals
+    label: 目標
+    label_singular: 目標
+    folder: src/content/goals
+    create: true
+    slug: '{{slug}}'
+    fields:
+      - { name: title, label: 目標, widget: string }
+      - {
+          name: term,
+          label: 類型,
+          widget: select,
+          options:
+            [
+              { label: 短期, value: short },
+              { label: 長期, value: long },
+            ],
+          default: short,
+        }
+      - {
+          name: status,
+          label: 狀態,
+          widget: select,
+          options:
+            [
+              { label: 待開始, value: todo },
+              { label: 進行中, value: doing },
+              { label: 已完成, value: done },
+            ],
+          default: todo,
+        }
+      - { name: order, label: 排序（數字小的在前）, widget: number, default: 0, value_type: int }
+      - {
+          name: target_date,
+          label: 目標日期,
+          widget: datetime,
+          required: false,
+          format: 'YYYY-MM-DD',
+          date_format: 'YYYY-MM-DD',
+          time_format: false,
+        }
+      - { name: body, label: 說明, widget: markdown, required: false }
+
+  # ---------- 作品 / Projects ----------
+  - name: projects
+    label: 作品
+    label_singular: 作品
+    folder: src/content/projects
+    create: true
+    slug: '{{slug}}'
+    fields:
+      - { name: title, label: 標題, widget: string }
+      - {
+          name: date,
+          label: 日期,
+          widget: datetime,
+          format: 'YYYY-MM-DD',
+          date_format: 'YYYY-MM-DD',
+          time_format: false,
+        }
+      - { name: summary, label: 簡介, widget: text, required: false }
+      - { name: tags, label: 標籤, widget: list, required: false, default: [] }
+      - { name: cover, label: 封面圖, widget: image, required: false }
+      - { name: link, label: 連結（選填）, widget: string, required: false }
+      - { name: order, label: 排序（數字小的在前）, widget: number, default: 0, value_type: int }
+      - { name: body, label: 說明, widget: markdown, required: false }
+
+  # ---------- 關於我 / About（單一頁面） ----------
+  - name: pages
+    label: 頁面
+    files:
+      - name: about
+        label: 關於我
+        file: src/content/about.md
+        fields:
+          - { name: title, label: 頁面標題, widget: string, default: About }
+          - { name: photo, label: 個人照片, widget: image, required: false }
+          - { name: body, label: 內容, widget: markdown }

@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../config';
+import { Content, frontmatter } from '../content/about.md';
+---
+
+<BaseLayout title="關於我">
+  <h1 class="page-title">{frontmatter.title ?? 'About'}</h1>
+
+  <div class="about">
+    {frontmatter.photo && <img src={frontmatter.photo} alt={SITE.author} class="photo" />}
+    <div class="prose">
+      <Content />
+    </div>
+  </div>
+
+  <div class="contact">
+    {SITE.email && <a href={`mailto:${SITE.email}`} class="card">✉️ {SITE.email}</a>}
+    {SITE.github && <a href={SITE.github} target="_blank" rel="noopener" class="card">🐙 GitHub</a>}
+  </div>
+</BaseLayout>
+
+<style>
+  .about {
+    margin-top: 1rem;
+  }
+  .photo {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 50%;
+    float: right;
+    margin: 0 0 1rem 1.5rem;
+  }
+  .prose :global(h2) {
+    margin-top: 2rem;
+  }
+  .contact {
+    clear: both;
+    margin-top: 2.5rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .contact .card {
+    color: var(--text);
+  }
+</style>

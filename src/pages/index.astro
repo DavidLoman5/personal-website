@@ -1,0 +1,115 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../config';
+
+// 進行中 / 待辦的目標,取前 5 個
+const statusRank = { doing: 0, todo: 1, done: 2 };
+const goals = (await getCollection('goals'))
+  .filter((g) => g.data.status !== 'done')
+  .sort((a, b) => statusRank[a.data.status] - statusRank[b.data.status] || a.data.order - b.data.order)
+  .slice(0, 5);
+
+const statusLabel = { todo: 'To do', doing: 'In progress', done: 'Done' };
+---
+
+<BaseLayout>
+  <section class="hero">
+    <h1>{SITE.title}</h1>
+    <p class="tagline">{SITE.tagline}</p>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <h2>Goals</h2>
+      <a href="/goals">View all →</a>
+    </div>
+    {
+      goals.length > 0 ? (
+        <ul class="goal-list">
+          {goals.map((g) => (
+            <li>
+              <a href={`/goals/${g.id}`}>
+                <span class={`badge badge-${g.data.status}`}>{statusLabel[g.data.status]}</span>
+                <span class="text">{g.data.title}</span>
+                <span class="arrow">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p class="muted">還沒有設定目標。</p>
+      )
+    }
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding: 3rem 0 2.5rem;
+  }
+  .hero h1 {
+    font-size: 2.4rem;
+    margin: 0 0 0.6rem;
+  }
+  .tagline {
+    font-size: 1.15rem;
+    color: var(--text-soft);
+    margin: 0;
+  }
+  section {
+    margin-bottom: 2.8rem;
+  }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .section-head h2 {
+    margin: 0;
+  }
+  .goal-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+  .goal-list a {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    color: var(--text);
+  }
+  .goal-list a:hover {
+    border-color: var(--accent);
+    text-decoration: none;
+  }
+  .goal-list .text {
+    flex: 1;
+  }
+  .goal-list .arrow {
+    color: var(--text-soft);
+  }
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    white-space: nowrap;
+    color: #fff;
+  }
+  .badge-todo {
+    background: #8a8f98;
+  }
+  .badge-doing {
+    background: var(--accent);
+  }
+  .badge-done {
+    background: #4a8f6a;
+  }
+</style>

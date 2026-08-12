@@ -1,0 +1,42 @@
+---
+// 深色/淺色切換按鈕
+---
+<button id="theme-toggle" aria-label="切換深色/淺色模式" title="切換深色/淺色模式">
+  <span class="icon-sun">☀️</span>
+  <span class="icon-moon">🌙</span>
+</button>
+
+<style>
+  #theme-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.35rem 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    color: var(--text);
+  }
+  #theme-toggle:hover {
+    border-color: var(--accent);
+  }
+  .icon-moon {
+    display: none;
+  }
+  :root[data-theme='dark'] .icon-sun {
+    display: none;
+  }
+  :root[data-theme='dark'] .icon-moon {
+    display: inline;
+  }
+</style>
+
+<script>
+  const btn = document.getElementById('theme-toggle');
+  btn?.addEventListener('click', () => {
+    const root = document.documentElement;
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+  });
+</script>
