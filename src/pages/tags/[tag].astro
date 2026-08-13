@@ -6,17 +6,19 @@ import { readingTime } from '../../lib/format';
 
 export async function getStaticPaths() {
   const tagMap = await getTagMap();
-  return [...tagMap.entries()].map(([tag, items]) => ({
-    params: { tag },
-    props: { tag, items },
+  // key 已經是正規化過的 slug(小寫、去掉會切路徑或在 Windows 上不合法的字元),
+  // 顯示用的原字串走 label 傳下去
+  return [...tagMap.entries()].map(([slug, { label, items }]) => ({
+    params: { tag: slug },
+    props: { label, items },
   }));
 }
 
 interface Props {
-  tag: string;
+  label: string;
   items: TaggedEntry[];
 }
-const { tag, items } = Astro.props;
+const { label, items } = Astro.props;
 
 // 文章在前、作品在後,各自新到舊
 const sorted = [...items].sort(
@@ -27,11 +29,11 @@ const sorted = [...items].sort(
 ---
 
 <BaseLayout
-  title={`#${tag}`}
-  description={`標籤 ${tag} 底下的文章與作品,共 ${items.length} 篇。`}
+  title={`#${label}`}
+  description={`標籤 ${label} 底下的文章與作品,共 ${items.length} 篇。`}
 >
   <p class="crumb"><a href="/tags/">← 回到所有標籤</a></p>
-  <h1 class="page-title">#{tag}</h1>
+  <h1 class="page-title">#{label}</h1>
   <p class="page-intro">共 {items.length} 篇。</p>
 
   <div class="stack">
@@ -43,7 +45,7 @@ const sorted = [...items].sort(
           date={entry.data.date}
           summary={entry.data.summary}
           tags={entry.data.tags}
-          minutes={kind === 'post' ? readingTime(entry.body ?? '') : undefined}
+          minutes={kind === 'post' ? readingTime(entry.body) : undefined}
         />
       ))
     }
@@ -57,9 +59,5 @@ const sorted = [...items].sort(
   }
   .page-title {
     margin-top: var(--space-3);
-  }
-  .stack {
-    display: grid;
-    gap: var(--space-4);
   }
 </style>

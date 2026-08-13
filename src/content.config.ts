@@ -14,9 +14,15 @@ const optionalText = z.preprocess(
   (v) => (typeof v === 'string' && v.trim() === '' ? undefined : v),
   z.string().optional(),
 );
+// 後台的 link 欄位用 pattern 限定了 ^https?://,這裡跟著限一樣的範圍 ——
+// 只寫 .url() 的話 ftp:// 之類會過得了網站卻存不進後台。
 const optionalUrl = z.preprocess(
   (v) => (typeof v === 'string' && v.trim() === '' ? undefined : v),
-  z.string().url('請填完整網址,要包含 https://').optional(),
+  z
+    .string()
+    .url('請填完整網址,要包含 https://')
+    .refine((u) => /^https?:\/\//i.test(u), '網址要用 http:// 或 https:// 開頭')
+    .optional(),
 );
 
 // 心得 / Blog 文章

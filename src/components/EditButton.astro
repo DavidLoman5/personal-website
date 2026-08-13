@@ -1,16 +1,16 @@
 ---
 // 連到後台對應項目的小按鈕 —— 省掉「先進 /admin 再自己找那一篇」的步驟。
-// 網址格式就是 Decap CMS 的路由;entry 用內容檔名(不含 .md),跟 Decap 的 slug 一致。
+// 網址怎麼組定義在 lib/cms.ts。
+import { adminUrl, type CmsCollection } from '../lib/cms';
+
 interface Props {
-  collection: string; // 後台集合名:blog / goals / projects / pages
-  entry?: string; // 檔名;省略代表「新增一筆」
+  collection: CmsCollection; // 後台集合名,打錯字建置時就會被抓到
+  entry?: string; // 內容檔名(entry.id);省略代表「新增一筆」
   label?: string; // 這顆按鈕對應的東西,只給螢幕閱讀器用
 }
 const { collection, entry, label } = Astro.props;
 
-const href = entry
-  ? `/admin/#/collections/${collection}/entries/${entry}`
-  : `/admin/#/collections/${collection}/new`;
+const href = adminUrl(collection, entry);
 const action = entry ? '編輯' : '新增';
 const aria = label ? `${action}:${label}` : action;
 ---

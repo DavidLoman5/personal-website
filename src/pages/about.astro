@@ -2,11 +2,11 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import EditButton from '../components/EditButton.astro';
 import { SITE } from '../config';
-import { Content, frontmatter } from '../content/about.md';
+import { about, AboutContent } from '../lib/pages';
 
 // 後台把欄位清空存的是 "",不是拿掉欄位 —— ?? 接不住空字串,會渲染出一個空標題
-const heading = frontmatter.title?.trim() || 'About';
-const photo = frontmatter.photo?.trim();
+const heading = about.title?.trim() || 'About';
+const photo = about.photo?.trim();
 ---
 
 <BaseLayout title={heading} description={`關於 ${SITE.author}。`}>
@@ -30,7 +30,7 @@ const photo = frontmatter.photo?.trim();
       )
     }
     <div class="prose">
-      <Content />
+      <AboutContent />
     </div>
   </div>
 

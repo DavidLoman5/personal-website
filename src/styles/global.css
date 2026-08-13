@@ -34,7 +34,6 @@
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
-  --radius-xl: 20px;
   --radius-full: 999px;
 
   --transition-fast: 0.12s ease;
@@ -362,6 +361,50 @@ a.tag:hover {
   color: var(--text-soft);
 }
 
+/* 一疊等距的卡片 —— blog 列表與標籤頁共用 */
+.stack {
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* 卡片標題。卡片裡還有別的連結(標籤、編輯鈕),不能直接把整張卡包成 <a>,
+   改用標題連結的 ::after 蓋滿整張卡撐開點擊範圍。
+   字級由各自的頁面決定,這裡只管共通行為。 */
+.card-title {
+  margin: 0;
+}
+.card-title a {
+  color: var(--text);
+}
+.card-title a:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+.card-title a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+/* 漸層裁字 —— 首頁大標與 404 的數字共用 */
+.gradient-text {
+  background: var(--grad);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+/* 少數瀏覽器不支援漸層裁字,退回純色,不要變成隱形字。
+   要換退回的顏色就在該元素上設 --gradient-fallback。 */
+@supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+  .gradient-text {
+    background: none;
+    color: var(--gradient-fallback, var(--text));
+    -webkit-text-fill-color: currentColor;
+  }
+}
+
 .page-title {
   font-size: var(--text-3xl);
   margin: var(--space-7) 0 var(--space-1);
@@ -439,8 +482,14 @@ a.tag:hover {
   margin: var(--space-5) auto;
   border-radius: var(--radius-md);
 }
+/* 表格在窄螢幕會撐破版面。markdown 不會幫表格包一層容器,所以讓表格自己
+   變成可橫捲的區塊:width: max-content 讓它照內容撐開,max-width 再把它
+   收在容器內,超出的部分就自己捲。 */
 .prose table {
-  width: 100%;
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
   border-collapse: collapse;
   margin: var(--space-5) 0;
   font-size: var(--text-sm);
@@ -453,10 +502,6 @@ a.tag:hover {
 }
 .prose th {
   background: var(--bg-soft);
-}
-/* 表格在窄螢幕會撐破版面,包一層可橫捲的容器 */
-.prose .table-wrap {
-  overflow-x: auto;
 }
 
 /* ── 捲動進場 ──────────────────────────────────────────────

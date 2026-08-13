@@ -5,7 +5,8 @@ import { getTagMap } from '../../lib/content';
 const tagMap = await getTagMap();
 // 篇數多的排前面,同樣多就照字面排
 const tags = [...tagMap.entries()].sort(
-  (a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], 'zh-Hant'),
+  ([, a], [, b]) =>
+    b.items.length - a.items.length || a.label.localeCompare(b.label, 'zh-Hant'),
 );
 ---
 
@@ -16,10 +17,10 @@ const tags = [...tagMap.entries()].sort(
   {
     tags.length > 0 ? (
       <ul class="tag-cloud">
-        {tags.map(([tag, items]) => (
+        {tags.map(([slug, { label, items }]) => (
           <li>
-            <a class="tag-chip" href={`/tags/${encodeURIComponent(tag)}/`}>
-              <span>#{tag}</span>
+            <a class="tag-chip" href={`/tags/${encodeURIComponent(slug)}/`}>
+              <span>#{label}</span>
               <span class="count">{items.length}</span>
             </a>
           </li>

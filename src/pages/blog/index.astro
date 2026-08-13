@@ -26,7 +26,7 @@ const posts = await getPosts();
               date={p.data.date}
               summary={p.data.summary}
               tags={p.data.tags}
-              minutes={readingTime(p.body ?? '')}
+              minutes={readingTime(p.body)}
             />
           </div>
         ))}
@@ -36,10 +36,3 @@ const posts = await getPosts();
     )
   }
 </BaseLayout>
-
-<style>
-  .stack {
-    display: grid;
-    gap: var(--space-4);
-  }
-</style>

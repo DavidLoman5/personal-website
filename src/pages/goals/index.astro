@@ -1,17 +1,18 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import EditButton from '../../components/EditButton.astro';
 import GoalItem from '../../components/GoalItem.astro';
-import { sortGoals, goalProgress, TERM_LABEL } from '../../lib/goals';
+import { goalProgress, TERM_LABEL } from '../../lib/goals';
+import { getGoals } from '../../lib/content';
 
-const all = await getCollection('goals', ({ data }) => !data.draft);
+// getGoals() 已經做完 draft 過濾與排序,filter 不會打亂順序
+const all = await getGoals();
 
 // 短期/長期兩區以前是幾乎逐字複製的兩段 JSX,改成跑同一份迴圈
 const sections = (['short', 'long'] as const).map((term) => ({
   term,
   label: TERM_LABEL[term],
-  goals: sortGoals(all.filter((g) => g.data.term === term)),
+  goals: all.filter((g) => g.data.term === term),
 }));
 
 const progress = goalProgress(all);

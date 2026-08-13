@@ -4,7 +4,8 @@
 import BaseLayout from './BaseLayout.astro';
 import EditButton from '../components/EditButton.astro';
 import TagList from '../components/TagList.astro';
-import { formatDate, isoDate } from '../lib/format';
+import MetaLine from '../components/MetaLine.astro';
+import type { CmsCollection } from '../lib/cms';
 
 interface Props {
   title: string;
@@ -15,9 +16,11 @@ interface Props {
   coverAlt?: string;
   /** 回上一層的連結,例如 { href: '/blog/', label: 'Blog' } */
   back: { href: string; label: string };
-  /** 後台集合名稱與檔名;有給才會顯示「編輯」按鈕 */
-  collection?: string;
-  editEntry?: string;
+  /**
+   * 後台集合名稱與檔名(entry.id)。有給才會顯示「編輯」按鈕。
+   * 兩個欄位綁在同一個物件裡 —— 拆成兩個選填欄位時,只填一個編輯鈕會靜默消失。
+   */
+  edit?: { collection: CmsCollection; entry: string };
   minutes?: number;
   /** 已完成的目標,標題要劃掉 */
   strike?: boolean;
@@ -32,8 +35,7 @@ const {
   cover,
   coverAlt,
   back,
-  collection,
-  editEntry,
+  edit,
   minutes,
   strike = false,
   prev,
@@ -51,18 +53,14 @@ const {
   <article>
     <div class="topbar">
       <a href={back.href} class="back">← 回到 {back.label}</a>
-      {collection && editEntry && (
-        <EditButton collection={collection} entry={editEntry} label={title} />
+      {edit && (
+        <EditButton collection={edit.collection} entry={edit.entry} label={title} />
       )}
     </div>
 
     <h1 class:list={['title', { strike }]}>{title}</h1>
 
-    <p class="meta">
-      {date && <time datetime={isoDate(date)}>{formatDate(date)}</time>}
-      {date && minutes && <span aria-hidden="true">·</span>}
-      {minutes && <span>{minutes} 分鐘讀完</span>}
-    </p>
+    <MetaLine date={date} minutes={minutes} />
 
     {/* goals 詳情頁用這個插槽放期程與狀態徽章 */}
     <div class="extra-meta"><slot name="meta" /></div>
@@ -133,16 +131,7 @@ const {
     text-decoration: line-through;
     color: var(--text-soft);
   }
-  .meta {
-    margin: 0;
-    font-size: var(--text-sm);
-    color: var(--text-soft);
-    display: flex;
-    gap: var(--space-2);
-    flex-wrap: wrap;
-  }
-  /* 沒有日期/插槽內容時不要留一段空白 */
-  .meta:not(:has(*)),
+  /* 插槽沒內容時不要留一段空白(.meta 那行由 MetaLine 自己處理) */
   .extra-meta:not(:has(*)) {
     display: none;
   }

@@ -1,0 +1,37 @@
+---
+// 「日期 · N 分鐘讀完」那一行。卡片與詳情頁以前各自抄了一份逐字相同的
+// markup 與 CSS,改一邊忘另一邊就會兩處長得不一樣,收成這個元件。
+import { formatDate, isoDate } from '../lib/format';
+
+interface Props {
+  date?: Date;
+  /** 幾分鐘讀完;沒給就不顯示 */
+  minutes?: number;
+}
+const { date, minutes } = Astro.props;
+
+// 用 != null 而不是 truthy —— minutes 是 0 的話,`{minutes && ...}`
+// 會直接在畫面上印出一個「0」
+const hasMinutes = minutes != null;
+---
+
+<p class="meta">
+  {date && <time datetime={isoDate(date)}>{formatDate(date)}</time>}
+  {date && hasMinutes && <span aria-hidden="true">·</span>}
+  {hasMinutes && <span>{minutes} 分鐘讀完</span>}
+</p>
+
+<style>
+  .meta {
+    margin: 0;
+    font-size: var(--text-sm);
+    color: var(--text-soft);
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+  /* 兩個欄位都沒給時不要留一段空白 */
+  .meta:not(:has(*)) {
+    display: none;
+  }
+</style>

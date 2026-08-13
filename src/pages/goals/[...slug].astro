@@ -1,12 +1,13 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { render } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
 import StatusBadge from '../../components/StatusBadge.astro';
 import { TERM_LABEL } from '../../lib/goals';
 import { formatDate } from '../../lib/format';
+import { getGoals } from '../../lib/content';
 
 export async function getStaticPaths() {
-  const goals = await getCollection('goals', ({ data }) => !data.draft);
+  const goals = await getGoals();
   return goals.map((goal) => ({
     params: { slug: goal.id },
     props: { goal },
@@ -20,8 +21,7 @@ const { Content } = await render(goal);
 <PostLayout
   title={goal.data.title}
   back={{ href: '/goals/', label: 'Goals' }}
-  collection="goals"
-  editEntry={goal.id}
+  edit={{ collection: 'goals', entry: goal.id }}
   strike={goal.data.status === 'done'}
 >
   <div slot="meta" class="meta-row">

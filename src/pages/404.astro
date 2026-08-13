@@ -8,7 +8,7 @@ const links = NAV_LINKS.filter((l) => l.href !== '/');
 
 <BaseLayout title="找不到頁面" description="這個網址不存在。">
   <section class="notfound">
-    <p class="code">404</p>
+    <p class="code gradient-text">404</p>
     <h1>這裡沒有東西</h1>
     <p class="muted">
       你要找的頁面不存在,可能是網址打錯了,或是這篇內容已經被搬走。
@@ -31,18 +31,8 @@ const links = NAV_LINKS.filter((l) => l.href !== '/');
     font-weight: 800;
     line-height: 1;
     letter-spacing: -0.04em;
-    background: var(--grad);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-  }
-  @supports not ((background-clip: text) or (-webkit-background-clip: text)) {
-    .code {
-      background: none;
-      color: var(--accent);
-      -webkit-text-fill-color: currentColor;
-    }
+    /* 不支援漸層裁字時,這裡的數字退回主色而不是一般文字色 */
+    --gradient-fallback: var(--accent);
   }
   h1 {
     font-size: var(--text-2xl);

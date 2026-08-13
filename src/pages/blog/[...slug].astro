@@ -33,9 +33,8 @@ const link = (p?: typeof post) =>
   cover={post.data.cover}
   coverAlt={post.data.cover_alt}
   back={{ href: '/blog/', label: 'Blog' }}
-  collection="blog"
-  editEntry={post.id}
-  minutes={readingTime(post.body ?? '')}
+  edit={{ collection: 'blog', entry: post.id }}
+  minutes={readingTime(post.body)}
   prev={link(older)}
   next={link(newer)}
 >

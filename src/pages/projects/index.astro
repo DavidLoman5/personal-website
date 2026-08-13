@@ -30,8 +30,8 @@ const projects = await getProjects();
                 decoding="async"
               />
             )}
-            {/* 標題連結撐開整張卡的點擊範圍;卡片內還有別的連結,不能直接包一層 <a> */}
-            <h2 class="title">
+            {/* .card-title 定義在 global.css:標題連結撐開整張卡的點擊範圍 */}
+            <h2 class="card-title title">
               <a href={`/projects/${p.id}/`}>{p.data.title}</a>
             </h2>
             {p.data.summary && <p class="muted summary">{p.data.summary}</p>}
@@ -71,21 +71,7 @@ const projects = await getProjects();
     margin-bottom: var(--space-3);
   }
   .title {
-    margin: 0;
     font-size: var(--text-lg);
-  }
-  .title a {
-    color: var(--text);
-  }
-  .title a:hover {
-    color: var(--accent);
-    text-decoration: none;
-  }
-  .title a::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
   }
   .summary {
     margin: var(--space-2) 0 0;

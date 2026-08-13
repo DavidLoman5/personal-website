@@ -1,23 +1,22 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import EditButton from '../components/EditButton.astro';
 import GoalItem from '../components/GoalItem.astro';
 import PostCard from '../components/PostCard.astro';
 import { SITE } from '../config';
-import { sortGoals, goalProgress } from '../lib/goals';
-import { getPosts, getProjects } from '../lib/content';
+import { goalProgress } from '../lib/goals';
+import { getGoals, getPosts, getProjects } from '../lib/content';
 import { readingTime } from '../lib/format';
 // 封面那句名言 —— 存在 src/content/home.md,可以從後台改
-import { frontmatter as home } from '../content/home.md';
+import { home } from '../lib/pages';
 
 // 後台清空欄位存的是空字串,?? 接不住 —— 用 || 才不會渲染出一對空引號
 const quote = home.quote?.trim() || SITE.tagline;
 
-const allGoals = await getCollection('goals', ({ data }) => !data.draft);
+const allGoals = await getGoals();
 const progress = goalProgress(allGoals);
-// 首頁只顯示還沒完成的,取前 4 個
-const goals = sortGoals(allGoals.filter((g) => g.data.status !== 'done')).slice(0, 4);
+// 首頁只顯示還沒完成的,取前 4 個(getGoals() 已排序,filter 不會打亂)
+const goals = allGoals.filter((g) => g.data.status !== 'done').slice(0, 4);
 
 const posts = (await getPosts()).slice(0, 2);
 const projects = (await getProjects()).slice(0, 2);
@@ -27,7 +26,7 @@ const projects = (await getProjects()).slice(0, 2);
   <section class="hero">
     <div class="glow" aria-hidden="true"></div>
     <p class="eyebrow muted">{SITE.author}</p>
-    <h1 class="quote">&ldquo;{quote}&rdquo;</h1>
+    <h1 class="quote gradient-text">&ldquo;{quote}&rdquo;</h1>
     <div class="cta">
       <a class="btn btn-primary" href="/goals/">看看我的目標</a>
       <a class="btn" href="/blog/">讀我的心得</a>
@@ -40,20 +39,26 @@ const projects = (await getProjects()).slice(0, 2);
       <h2>Goals</h2>
       <a href="/goals/">全部目標 →</a>
     </div>
+    {/* 進度列與清單各自判斷 —— 綁在一起的話,目標全部完成時
+        (goals 是「未完成的」,長度會變 0)進度列會正好在 100% 那一刻消失 */}
+    {
+      progress.total > 0 && (
+        <p class="progress-line muted">
+          已完成 <strong>{progress.done}</strong> / {progress.total} 個目標
+        </p>
+      )
+    }
     {
       goals.length > 0 ? (
-        <>
-          <p class="progress-line muted">
-            已完成 <strong>{progress.done}</strong> / {progress.total} 個目標
-          </p>
-          <ul class="goal-list">
-            {goals.map((goal) => (
-              <GoalItem goal={goal} showTarget={false} />
-            ))}
-          </ul>
-        </>
+        <ul class="goal-list">
+          {goals.map((goal) => (
+            <GoalItem goal={goal} showTarget={false} />
+          ))}
+        </ul>
       ) : (
-        <p class="muted">目前沒有進行中的目標。</p>
+        <p class="muted">
+          {progress.total > 0 ? '目標都完成了,正在想下一個。' : '還沒有設定目標。'}
+        </p>
       )
     }
   </section>
@@ -73,7 +78,7 @@ const projects = (await getProjects()).slice(0, 2);
               date={p.data.date}
               summary={p.data.summary}
               tags={p.data.tags}
-              minutes={readingTime(p.body ?? '')}
+              minutes={readingTime(p.body)}
             />
           ))}
         </div>
@@ -142,20 +147,6 @@ const projects = (await getProjects()).slice(0, 2);
     max-width: 16em;
     /* 避免長句最後一行只剩一兩個字 */
     text-wrap: balance;
-    background: var(--grad);
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    /* 漸層裁字在少數瀏覽器不生效,先給一個看得見的底色當保險 */
-    -webkit-text-fill-color: transparent;
-  }
-  /* 不支援 background-clip: text 就退回一般文字顏色,不要變成隱形 */
-  @supports not ((background-clip: text) or (-webkit-background-clip: text)) {
-    .quote {
-      background: none;
-      color: var(--text);
-      -webkit-text-fill-color: currentColor;
-    }
   }
   .cta {
     display: flex;

@@ -23,8 +23,7 @@ const { Content } = await render(project);
   cover={project.data.cover}
   coverAlt={project.data.cover_alt}
   back={{ href: '/projects/', label: 'Projects' }}
-  collection="projects"
-  editEntry={project.id}
+  edit={{ collection: 'projects', entry: project.id }}
 >
   {
     project.data.link && (

@@ -33,8 +33,8 @@ export function isoDate(date: Date): string {
  * 粗估閱讀時間。中文按字數算(每分鐘約 350 字),英文按單字數(每分鐘約 220 字);
  * 中英混排就兩邊相加,不會因為中文沒有空格而被算成「一個字」。
  */
-export function readingTime(body: string): number {
-  const text = body
+export function readingTime(body: string | undefined): number {
+  const text = (body ?? '')
     .replace(/```[\s\S]*?```/g, '') // 程式碼區塊不算
     .replace(/!?\[[^\]]*\]\([^)]*\)/g, '') // 連結與圖片語法
     .replace(/[#>*_`~-]/g, '');
