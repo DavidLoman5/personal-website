@@ -1,31 +1,111 @@
+/* ── 設計 token ───────────────────────────────────────────────
+   間距、字級、圓角一律走這裡的變數,不要再在各元件寫死數值,
+   否則同一種東西在不同頁面會差個 0.05rem,累積起來版面就散了。 */
 :root {
-  --max-width: 720px;
+  --max-width: 760px;
+  /* 首頁與 Projects 網格用得到的寬版容器 */
+  --max-width-wide: 1080px;
+
   --font-sans: system-ui, -apple-system, "Segoe UI", "Noto Sans TC",
     "PingFang TC", "Microsoft JhengHei", sans-serif;
   --font-mono: ui-monospace, "SFMono-Regular", "Menlo", monospace;
 
-  /* 淺色主題 */
-  --bg: #fbfbfa;
-  --bg-soft: #f2f1ee;
-  --surface: #ffffff;
-  --text: #1f2328;
-  --text-soft: #57606a;
-  --border: #e4e2dd;
-  --accent: #2f6f4f;
-  --accent-hover: #245a3f;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 2.5rem;
+  --space-8: 3rem;
+  --space-9: 4rem;
+  --space-10: 5rem;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  /* 大標隨視窗流體縮放,窄螢幕不會撐破版面 */
+  --text-2xl: clamp(1.5rem, 3.5vw, 1.8rem);
+  --text-3xl: clamp(1.8rem, 4.5vw, 2.3rem);
+  --text-4xl: clamp(2.1rem, 6vw, 3.2rem);
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 999px;
+
+  --transition-fast: 0.12s ease;
+  --transition-base: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* sticky header 的高度 —— 錨點捲動與 scroll-margin 要扣掉它 */
+  --header-h: 60px;
 }
 
+/* ── 淺色主題 ─────────────────────────────────────────────── */
+:root {
+  --bg: #fbfbfd;
+  --bg-soft: #f1f2f7;
+  --surface: #ffffff;
+  --text: #14161c;
+  --text-soft: #5b6072;
+  --border: #e2e4ee;
+
+  --accent: #4f46e5;
+  --accent-2: #0891b2;
+  --accent-hover: #4338ca;
+  /* 半透明的強調色 —— 用在光暈、hover 底色,不要直接對 --accent 開 opacity,
+     那會連帶把上面的文字一起變淡 */
+  --accent-wash: rgba(79, 70, 229, 0.09);
+
+  --shadow: 0 1px 3px rgba(20, 22, 28, 0.06), 0 1px 2px rgba(20, 22, 28, 0.04);
+  --shadow-lg: 0 12px 32px -8px rgba(20, 22, 28, 0.14);
+
+  /* 狀態色:底色 + 對應的前景色成對定義。
+     淺色主題用深底白字,才過得了 WCAG AA 4.5:1(badge 字級只有 12px,算一般文字)。 */
+  --status-todo: #5b6472;
+  --status-todo-fg: #ffffff;
+  --status-doing: #4f46e5;
+  --status-doing-fg: #ffffff;
+  --status-done: #15803d;
+  --status-done-fg: #ffffff;
+
+  color-scheme: light;
+}
+
+/* ── 深色主題 ─────────────────────────────────────────────── */
 :root[data-theme='dark'] {
-  --bg: #16181d;
-  --bg-soft: #1e2127;
-  --surface: #1e2127;
-  --text: #e6e6e3;
-  --text-soft: #9ba1a9;
-  --border: #2c3038;
-  --accent: #6bbf8f;
-  --accent-hover: #85cfa4;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --bg: #0d0f16;
+  --bg-soft: #161a24;
+  --surface: #141823;
+  --text: #e8eaf2;
+  --text-soft: #9aa1b8;
+  --border: #262b3a;
+
+  --accent: #818cf8;
+  --accent-2: #22d3ee;
+  --accent-hover: #a5b4fc;
+  --accent-wash: rgba(129, 140, 248, 0.14);
+
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 32px -8px rgba(0, 0, 0, 0.6);
+
+  /* 深色主題反過來:亮底深字。同樣的色票在深色底上如果沿用白字,
+     對比只有 2 點多,完全不合格。 */
+  --status-todo: #94a3b8;
+  --status-todo-fg: #0d0f16;
+  --status-doing: #818cf8;
+  --status-doing-fg: #0d0f16;
+  --status-done: #4ade80;
+  --status-done-fg: #0d0f16;
+
+  color-scheme: dark;
+}
+
+/* 主色漸層 —— hero 大標、active 導覽底線、卡片 hover 邊框共用 */
+:root {
+  --grad: linear-gradient(135deg, var(--accent), var(--accent-2));
 }
 
 * {
@@ -45,7 +125,7 @@ body {
   color: var(--text);
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
-  transition: background 0.12s ease, color 0.12s ease;
+  transition: background var(--transition-fast), color var(--transition-fast);
 }
 
 /* 觸控裝置:不要等雙擊縮放判定 */
@@ -72,13 +152,13 @@ label {
   z-index: 100;
   background: var(--surface);
   border: 1px solid var(--accent);
-  border-radius: 8px;
-  padding: 0.6rem 1rem;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
   color: var(--text);
 }
 .skip-link:focus {
-  left: 1rem;
-  top: 1rem;
+  left: var(--space-4);
+  top: var(--space-4);
   text-decoration: none;
 }
 
@@ -86,7 +166,12 @@ label {
   width: 100%;
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 0 1.2rem;
+  padding: 0 var(--space-5);
+}
+
+/* 寬版容器 —— 內文以外的網格頁面用 */
+.container-wide {
+  max-width: var(--max-width-wide);
 }
 
 a {
@@ -98,21 +183,23 @@ a:hover {
   text-decoration: underline;
 }
 
-h1, h2, h3 {
-  line-height: 1.3;
+h1,
+h2,
+h3 {
+  line-height: 1.25;
   font-weight: 700;
+  letter-spacing: -0.015em;
 }
 
 img {
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
 }
 
 hr {
   border: none;
   border-top: 1px solid var(--border);
-  margin: 2rem 0;
+  margin: var(--space-6) 0;
 }
 
 code {
@@ -120,11 +207,11 @@ code {
   font-size: 0.9em;
   background: var(--bg-soft);
   padding: 0.15em 0.4em;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 pre {
-  padding: 1rem;
-  border-radius: 8px;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
   overflow-x: auto;
   border: 1px solid var(--border);
 }
@@ -134,75 +221,310 @@ pre code {
 }
 
 blockquote {
-  margin: 1.2rem 0;
-  padding: 0.4rem 1rem;
+  margin: var(--space-5) 0;
+  padding: var(--space-1) var(--space-4);
   border-left: 3px solid var(--accent);
   color: var(--text-soft);
 }
 
-/* 共用元件樣式 */
+/* ── 共用元件 ─────────────────────────────────────────────── */
+
 .tag {
   display: inline-block;
-  font-size: 0.78rem;
+  font-size: var(--text-xs);
   color: var(--text-soft);
   background: var(--bg-soft);
   border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 0.1rem 0.6rem;
+  border-radius: var(--radius-full);
+  padding: 0.1rem var(--space-3);
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+a.tag:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  text-decoration: none;
 }
 
 .card {
   display: block;
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 1.1rem 1.3rem;
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
   box-shadow: var(--shadow);
-  transition: transform 0.12s ease, border-color 0.12s ease;
+  transition: transform var(--transition-base), box-shadow var(--transition-base),
+    border-color var(--transition-base);
 }
-a.card:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent);
+
+/* hover 時沿著卡片外緣描一圈漸層。
+   用 ::before + mask 來做,才能只染邊框不染內容;直接改 border-image
+   會失去 border-radius。 */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--grad);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  pointer-events: none;
+}
+.card:hover::before,
+.card:focus-within::before {
+  opacity: 1;
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
   text-decoration: none;
 }
 
 /* 按下去的即時回饋 —— 刻意把 transition 歸零,手指一按就要看到反應。
    -webkit-tap-highlight-color 只加在「有自訂 :active 樣式」的元素上;
    加在全部連結上的話,內文連結會失去系統預設的灰色回饋卻換不到東西。 */
-a.card,
-.goal-list a,
-.goals a {
+.card,
+.row-link {
   -webkit-tap-highlight-color: transparent;
 }
-a.card:active,
-.goal-list a:active,
-.goals a:active {
+.card:active,
+.row-link:active {
   transform: scale(0.985);
-  border-color: var(--accent);
   transition-duration: 0s;
+}
+
+/* 目標清單那種「一整列都可以點」的橫條 */
+.row-link {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  color: var(--text);
+  transition: border-color var(--transition-fast), background var(--transition-fast),
+    transform var(--transition-fast);
+}
+.row-link:hover {
+  border-color: var(--accent);
+  background: var(--accent-wash);
+  text-decoration: none;
+  color: var(--text);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  /* 44px 下限,手機上才不會誤觸 */
+  min-height: 44px;
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition: border-color var(--transition-fast), background var(--transition-fast),
+    transform var(--transition-fast);
+}
+.btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-wash);
+  color: var(--text);
+  text-decoration: none;
+}
+.btn:active {
+  transform: scale(0.97);
+  transition-duration: 0s;
+}
+.btn-primary {
+  background: var(--grad);
+  border-color: transparent;
+  /* 漸層底一律配白字 —— 兩個主題的漸層都夠深,白字在上面都過 AA */
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--grad);
+  color: #fff;
+  filter: brightness(1.08);
 }
 
 .muted {
   color: var(--text-soft);
 }
 
+/* 一疊等距的卡片 —— blog 列表與標籤頁共用 */
+.stack {
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* 卡片標題。卡片裡還有別的連結(標籤、編輯鈕),不能直接把整張卡包成 <a>,
+   改用標題連結的 ::after 蓋滿整張卡撐開點擊範圍。
+   字級由各自的頁面決定,這裡只管共通行為。 */
+.card-title {
+  margin: 0;
+}
+.card-title a {
+  color: var(--text);
+}
+.card-title a:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+.card-title a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+/* 漸層裁字 —— 首頁大標與 404 的數字共用 */
+.gradient-text {
+  background: var(--grad);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+/* 少數瀏覽器不支援漸層裁字,退回純色,不要變成隱形字。
+   要換退回的顏色就在該元素上設 --gradient-fallback。 */
+@supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+  .gradient-text {
+    background: none;
+    color: var(--gradient-fallback, var(--text));
+    -webkit-text-fill-color: currentColor;
+  }
+}
+
 .page-title {
-  font-size: 2rem;
-  margin: 2.2rem 0 0.3rem;
+  font-size: var(--text-3xl);
+  margin: var(--space-7) 0 var(--space-1);
 }
 .page-intro {
   color: var(--text-soft);
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-6);
 }
 
 /* 頁面標題列:左邊標題,右邊「編輯 / 新增」按鈕。
-   跟 .section-head 一樣對齊基線,窄螢幕放不下就換行。 */
+   對齊基線,窄螢幕放不下就換行。 */
 .page-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 1rem;
+  gap: var(--space-4);
   flex-wrap: wrap;
+}
+
+/* 區塊標題列:左標題,右「View all →」 */
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+.section-head h2 {
+  margin: 0;
+  font-size: var(--text-2xl);
+}
+
+/* ── 文章內文排版 ──────────────────────────────────────────
+   blog / goals / about 三種內文共用。之前這裡幾乎是空的,
+   段落與清單全靠瀏覽器預設,行距和留白跟站上其他地方對不起來。 */
+.prose {
+  font-size: var(--text-base);
+}
+.prose > :first-child {
+  margin-top: 0;
+}
+.prose p {
+  margin: var(--space-4) 0;
+}
+.prose h2 {
+  font-size: var(--text-2xl);
+  margin: var(--space-7) 0 var(--space-3);
+  /* sticky header 會蓋住錨點,先預留高度 */
+  scroll-margin-top: calc(var(--header-h) + var(--space-4));
+}
+.prose h3 {
+  font-size: var(--text-xl);
+  margin: var(--space-6) 0 var(--space-2);
+  scroll-margin-top: calc(var(--header-h) + var(--space-4));
+}
+.prose ul,
+.prose ol {
+  margin: var(--space-4) 0;
+  padding-left: var(--space-5);
+}
+.prose li {
+  margin: var(--space-2) 0;
+}
+.prose li::marker {
+  color: var(--text-soft);
+}
+.prose a {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+.prose img {
+  display: block;
+  margin: var(--space-5) auto;
+  border-radius: var(--radius-md);
+}
+/* 表格在窄螢幕會撐破版面。markdown 不會幫表格包一層容器,所以讓表格自己
+   變成可橫捲的區塊:width: max-content 讓它照內容撐開,max-width 再把它
+   收在容器內,超出的部分就自己捲。 */
+.prose table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: var(--space-5) 0;
+  font-size: var(--text-sm);
+}
+.prose th,
+.prose td {
+  border: 1px solid var(--border);
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+}
+.prose th {
+  background: var(--bg-soft);
+}
+
+/* ── 捲動進場 ──────────────────────────────────────────────
+   純 CSS,不掛任何 JS。瀏覽器不支援 scroll-driven animation 時
+   整段不生效,元素就是一開始就顯示 —— 沒有「永遠停在透明」的風險。 */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+}
+@keyframes reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* 使用者在系統開啟「減少動態效果」時,關掉所有位移與過場 */
@@ -214,7 +536,12 @@ a.card:active,
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
-  a.card:hover {
+  .card:hover {
+    transform: none;
+  }
+  .reveal {
+    animation: none;
+    opacity: 1;
     transform: none;
   }
 }

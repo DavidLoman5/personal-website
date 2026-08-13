@@ -1,10 +1,13 @@
 ---
-import { getCollection, render } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import EditButton from '../../components/EditButton.astro';
+import { render } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+import StatusBadge from '../../components/StatusBadge.astro';
+import { TERM_LABEL } from '../../lib/goals';
+import { formatDate } from '../../lib/format';
+import { getGoals } from '../../lib/content';
 
 export async function getStaticPaths() {
-  const goals = await getCollection('goals');
+  const goals = await getGoals();
   return goals.map((goal) => ({
     params: { slug: goal.id },
     props: { goal },
@@ -13,79 +16,34 @@ export async function getStaticPaths() {
 
 const { goal } = Astro.props;
 const { Content } = await render(goal);
-
-const statusLabel = { todo: 'To do', doing: 'In progress', done: 'Done' };
-const termLabel = { short: 'Short-term', long: 'Long-term' };
-
-const targetStr = goal.data.target_date
-  ? goal.data.target_date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-  : '';
 ---
 
-<BaseLayout title={goal.data.title}>
-  <article>
-    <div class="topbar">
-      <a href="/goals/" class="back">← Back to Goals</a>
-      <EditButton collection="goals" entry={goal.id} label={goal.data.title} />
-    </div>
-    <h1 class={`title ${goal.data.status === 'done' ? 'done' : ''}`}>{goal.data.title}</h1>
+<PostLayout
+  title={goal.data.title}
+  back={{ href: '/goals/', label: 'Goals' }}
+  edit={{ collection: 'goals', entry: goal.id }}
+  strike={goal.data.status === 'done'}
+>
+  <div slot="meta" class="meta-row">
+    <span class="tag">{TERM_LABEL[goal.data.term]}</span>
+    <StatusBadge status={goal.data.status} />
+    {
+      goal.data.target_date && (
+        <span class="muted">目標日期:{formatDate(goal.data.target_date)}</span>
+      )
+    }
+  </div>
 
-    <div class="meta">
-      <span class="tag">{termLabel[goal.data.term]}</span>
-      <span class={`badge badge-${goal.data.status}`}>{statusLabel[goal.data.status]}</span>
-      {targetStr && <span class="muted">Target: {targetStr}</span>}
-    </div>
-
-    <div class="prose">
-      <Content />
-    </div>
-  </article>
-</BaseLayout>
+  <Content />
+</PostLayout>
 
 <style>
-  article {
-    margin-top: 2rem;
-  }
-  .topbar {
+  .meta-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-  .back {
-    font-size: 0.9rem;
-  }
-  .title {
-    font-size: 2rem;
-    margin: 1rem 0 0.6rem;
-  }
-  .title.done {
-    text-decoration: line-through;
-    color: var(--text-soft);
-  }
-  .meta {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
+    gap: var(--space-2);
     flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-  }
-  .prose {
-    margin-top: 1rem;
-  }
-  .badge {
-    font-size: 0.78rem;
-    padding: 0.15rem 0.6rem;
-    border-radius: 999px;
-    color: #fff;
-  }
-  .badge-todo {
-    background: #8a8f98;
-  }
-  .badge-doing {
-    background: var(--accent);
-  }
-  .badge-done {
-    background: #4a8f6a;
+    font-size: var(--text-sm);
+    margin-top: var(--space-3);
   }
 </style>

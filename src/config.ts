@@ -9,6 +9,8 @@ export const SITE = {
   // 你的聯絡方式與社群(沒有的就留空字串,會自動不顯示)
   email: 'felixchen030496@gmail.com',
   github: 'https://github.com/DavidLoman5',
+  // 分享到社群時的預設預覽圖(放在 public/,用站內絕對路徑)
+  ogImage: '/og.png',
 };
 
 // 導覽列項目

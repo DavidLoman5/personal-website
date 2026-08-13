@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { NAV_LINKS } from '../config';
+
+// 首頁的連結在下面已經有一顆按鈕了,清單裡就不重複列
+const links = NAV_LINKS.filter((l) => l.href !== '/');
+---
+
+<BaseLayout title="找不到頁面" description="這個網址不存在。">
+  <section class="notfound">
+    <p class="code gradient-text">404</p>
+    <h1>這裡沒有東西</h1>
+    <p class="muted">
+      你要找的頁面不存在,可能是網址打錯了,或是這篇內容已經被搬走。
+    </p>
+    <p><a class="btn btn-primary" href="/">回首頁</a></p>
+    <nav aria-label="其他頁面" class="links">
+      {links.map((l) => <a href={l.href}>{l.label}</a>)}
+    </nav>
+  </section>
+</BaseLayout>
+
+<style>
+  .notfound {
+    padding: var(--space-10) 0 var(--space-8);
+    text-align: center;
+  }
+  .code {
+    margin: 0;
+    font-size: clamp(3.5rem, 14vw, 6rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    /* 不支援漸層裁字時,這裡的數字退回主色而不是一般文字色 */
+    --gradient-fallback: var(--accent);
+  }
+  h1 {
+    font-size: var(--text-2xl);
+    margin: var(--space-4) 0 var(--space-2);
+  }
+  .notfound p.muted {
+    max-width: 26em;
+    margin: 0 auto var(--space-6);
+  }
+  .links {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-top: var(--space-7);
+    font-size: var(--text-sm);
+  }
+</style>

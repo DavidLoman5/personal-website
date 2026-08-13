@@ -1,24 +1,27 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import EditButton from '../../components/EditButton.astro';
+import GoalItem from '../../components/GoalItem.astro';
+import { goalProgress, TERM_LABEL } from '../../lib/goals';
+import { getGoals } from '../../lib/content';
 
-const all = await getCollection('goals');
-const statusRank = { doing: 0, todo: 1, done: 2 };
-const sortFn = (a: any, b: any) =>
-  statusRank[a.data.status] - statusRank[b.data.status] || a.data.order - b.data.order;
+// getGoals() 已經做完 draft 過濾與排序,filter 不會打亂順序
+const all = await getGoals();
 
-const shortGoals = all.filter((g) => g.data.term === 'short').sort(sortFn);
-const longGoals = all.filter((g) => g.data.term === 'long').sort(sortFn);
+// 短期/長期兩區以前是幾乎逐字複製的兩段 JSX,改成跑同一份迴圈
+const sections = (['short', 'long'] as const).map((term) => ({
+  term,
+  label: TERM_LABEL[term],
+  goals: all.filter((g) => g.data.term === term),
+}));
 
-const statusLabel = { todo: 'To do', doing: 'In progress', done: 'Done' };
-
-function fmt(d?: Date) {
-  return d ? d.toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) : '';
-}
+const progress = goalProgress(all);
 ---
 
-<BaseLayout title="Goals">
+<BaseLayout
+  title="Goals"
+  description="Felix 正在努力的短期與長期目標,以及各自的進度。"
+>
   <div class="page-head">
     <h1 class="page-title">Goals</h1>
     <EditButton collection="goals" label="目標" />
@@ -26,113 +29,88 @@ function fmt(d?: Date) {
   <p class="page-intro">我正在努力的短期與長期目標,點進去看細節。</p>
 
   {
-    all.length === 0 && (
-      <p class="muted">還沒有設定目標,到 <code>/admin</code> 新增吧!</p>
-    )
-  }
+    all.length === 0 ? (
+      <p class="muted">還沒有設定目標。</p>
+    ) : (
+      <>
+        <div class="progress">
+          <div class="progress-head">
+            <span class="muted">整體進度</span>
+            <span class="progress-num">
+              {progress.done} / {progress.total}
+            </span>
+          </div>
+          <div
+            class="bar"
+            role="progressbar"
+            aria-label="目標完成度"
+            aria-valuenow={progress.percent}
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+            <span class="fill" style={`width: ${progress.percent}%`} />
+          </div>
+        </div>
 
-  {
-    shortGoals.length > 0 && (
-      <section>
-        <h2>Short-term</h2>
-        <ul class="goals">
-          {shortGoals.map((g) => (
-            <li>
-              <a href={`/goals/${g.id}/`} class={g.data.status === 'done' ? 'done' : ''}>
-                <span class={`badge badge-${g.data.status}`}>{statusLabel[g.data.status]}</span>
-                <span class="body">
-                  <span class="text">{g.data.title}</span>
-                  {g.data.target_date && <span class="muted target">Target: {fmt(g.data.target_date)}</span>}
-                </span>
-                <span class="arrow">→</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </section>
-    )
-  }
-
-  {
-    longGoals.length > 0 && (
-      <section>
-        <h2>Long-term</h2>
-        <ul class="goals">
-          {longGoals.map((g) => (
-            <li>
-              <a href={`/goals/${g.id}/`} class={g.data.status === 'done' ? 'done' : ''}>
-                <span class={`badge badge-${g.data.status}`}>{statusLabel[g.data.status]}</span>
-                <span class="body">
-                  <span class="text">{g.data.title}</span>
-                  {g.data.target_date && <span class="muted target">Target: {fmt(g.data.target_date)}</span>}
-                </span>
-                <span class="arrow">→</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </section>
+        {sections.map(
+          (s) =>
+            s.goals.length > 0 && (
+              <section class="reveal">
+                <h2>{s.label}</h2>
+                <ul class="goals">
+                  {s.goals.map((goal) => (
+                    <GoalItem goal={goal} />
+                  ))}
+                </ul>
+              </section>
+            ),
+        )}
+      </>
     )
   }
 </BaseLayout>
 
 <style>
+  .progress {
+    margin-bottom: var(--space-7);
+  }
+  .progress-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-2);
+  }
+  .progress-num {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+  .bar {
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .fill {
+    display: block;
+    height: 100%;
+    background: var(--grad);
+    border-radius: inherit;
+  }
+
   section {
-    margin-bottom: 2.5rem;
+    margin-bottom: var(--space-7);
+  }
+  section h2 {
+    font-size: var(--text-2xl);
+    margin: 0 0 var(--space-4);
   }
   .goals {
     list-style: none;
     padding: 0;
     margin: 0;
     display: grid;
-    gap: 0.6rem;
-  }
-  .goals a {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.7rem;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 0.8rem 1rem;
-    color: var(--text);
-  }
-  .goals a:hover {
-    border-color: var(--accent);
-    text-decoration: none;
-  }
-  .goals a.done .text {
-    text-decoration: line-through;
-    color: var(--text-soft);
-  }
-  .body {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
-    flex: 1;
-  }
-  .target {
-    font-size: 0.8rem;
-  }
-  .arrow {
-    color: var(--text-soft);
-    margin-top: 0.15rem;
-  }
-  .badge {
-    font-size: 0.75rem;
-    padding: 0.15rem 0.55rem;
-    border-radius: 999px;
-    white-space: nowrap;
-    color: #fff;
-    margin-top: 0.15rem;
-  }
-  .badge-todo {
-    background: #8a8f98;
-  }
-  .badge-doing {
-    background: var(--accent);
-  }
-  .badge-done {
-    background: #4a8f6a;
+    gap: var(--space-2);
   }
 </style>

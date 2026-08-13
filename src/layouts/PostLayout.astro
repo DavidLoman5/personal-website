@@ -1,6 +1,11 @@
 ---
+// blog / goals / projects 三種詳情頁共用的版型。
+// 以前 goals 詳情頁整份重造了這個檔案的 markup 與 CSS,現在收成一份。
 import BaseLayout from './BaseLayout.astro';
 import EditButton from '../components/EditButton.astro';
+import TagList from '../components/TagList.astro';
+import MetaLine from '../components/MetaLine.astro';
+import type { CmsCollection } from '../lib/cms';
 
 interface Props {
   title: string;
@@ -8,39 +13,67 @@ interface Props {
   tags?: string[];
   summary?: string;
   cover?: string;
-  // 這篇在後台的檔名;有給才會顯示「編輯」按鈕
-  editEntry?: string;
+  coverAlt?: string;
+  /** 回上一層的連結,例如 { href: '/blog/', label: 'Blog' } */
+  back: { href: string; label: string };
+  /**
+   * 後台集合名稱與檔名(entry.id)。有給才會顯示「編輯」按鈕。
+   * 兩個欄位綁在同一個物件裡 —— 拆成兩個選填欄位時,只填一個編輯鈕會靜默消失。
+   */
+  edit?: { collection: CmsCollection; entry: string };
+  minutes?: number;
+  /** 已完成的目標,標題要劃掉 */
+  strike?: boolean;
+  prev?: { href: string; title: string };
+  next?: { href: string; title: string };
 }
-const { title, date, tags = [], summary, cover, editEntry } = Astro.props;
-
-const dateStr = date
-  ? date.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' })
-  : '';
+const {
+  title,
+  date,
+  tags = [],
+  summary,
+  cover,
+  coverAlt,
+  back,
+  edit,
+  minutes,
+  strike = false,
+  prev,
+  next,
+} = Astro.props;
 ---
 
-<BaseLayout title={title} description={summary}>
+<BaseLayout
+  title={title}
+  description={summary}
+  ogType="article"
+  publishedTime={date}
+  image={cover}
+>
   <article>
     <div class="topbar">
-      <a href="/blog/" class="back">← Back to Blog</a>
-      {editEntry && <EditButton collection="blog" entry={editEntry} label={title} />}
+      <a href={back.href} class="back">← 回到 {back.label}</a>
+      {edit && (
+        <EditButton collection={edit.collection} entry={edit.entry} label={title} />
+      )}
     </div>
-    <h1 class="title">{title}</h1>
-    {dateStr && <time class="muted">{dateStr}</time>}
+
+    <h1 class:list={['title', { strike }]}>{title}</h1>
+
+    <MetaLine date={date} minutes={minutes} />
+
+    {/* goals 詳情頁用這個插槽放期程與狀態徽章 */}
+    <div class="extra-meta"><slot name="meta" /></div>
+
+    <TagList tags={tags} />
+
     {
-      tags.length > 0 && (
-        <div class="tags">
-          {tags.map((t) => (
-            <span class="tag">#{t}</span>
-          ))}
-        </div>
-      )
-    }
-    {
-      /* 封面在首屏,是 LCP 元素 —— 不能 lazy,否則反而拖慢首次繪製 */
+      /* 封面在首屏,是 LCP 元素 —— 不能 lazy,否則反而拖慢首次繪製。
+         沒填說明文字就當純裝飾(alt=""),用標題當 alt 只會讓螢幕閱讀器把同一句唸兩次。 */
       cover && (
         <img
           src={cover}
-          alt={title}
+          alt={coverAlt ?? ''}
           class="cover"
           width="1600"
           height="900"
@@ -49,50 +82,111 @@ const dateStr = date
         />
       )
     }
+
     <div class="prose">
       <slot />
     </div>
+
+    {
+      (prev || next) && (
+        <nav class="pager" aria-label="上下篇">
+          {prev ? (
+            <a href={prev.href} class="pager-link">
+              <span class="pager-label muted">← 上一篇</span>
+              <span class="pager-title">{prev.title}</span>
+            </a>
+          ) : (
+            <span />
+          )}
+          {next && (
+            <a href={next.href} class="pager-link next">
+              <span class="pager-label muted">下一篇 →</span>
+              <span class="pager-title">{next.title}</span>
+            </a>
+          )}
+        </nav>
+      )
+    }
   </article>
 </BaseLayout>
 
 <style>
   article {
-    margin-top: 2rem;
+    margin-top: var(--space-6);
   }
   .topbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
+    gap: var(--space-4);
   }
   .back {
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
   }
   .title {
-    font-size: 2.1rem;
-    margin: 1rem 0 0.4rem;
+    font-size: var(--text-3xl);
+    margin: var(--space-4) 0 var(--space-2);
   }
-  .tags {
-    margin-top: 0.7rem;
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
+  .title.strike {
+    text-decoration: line-through;
+    color: var(--text-soft);
+  }
+  /* 插槽沒內容時不要留一段空白(.meta 那行由 MetaLine 自己處理) */
+  .extra-meta:not(:has(*)) {
+    display: none;
   }
   .cover {
     width: 100%;
     /* 先佔好版位,圖載入時畫面才不會跳動 */
     aspect-ratio: 16 / 9;
     object-fit: cover;
-    margin: 1.5rem 0;
+    border-radius: var(--radius-lg);
+    margin: var(--space-5) 0;
   }
   .prose {
-    margin-top: 1.5rem;
+    margin-top: var(--space-5);
   }
-  .prose :global(h2) {
-    margin-top: 2rem;
+
+  .pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
   }
-  .prose :global(img) {
-    display: block;
-    margin: 1.5rem auto;
+  .pager-link {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    transition: border-color var(--transition-fast), background var(--transition-fast);
+  }
+  .pager-link:hover {
+    border-color: var(--accent);
+    background: var(--accent-wash);
+    text-decoration: none;
+  }
+  .pager-link.next {
+    text-align: right;
+  }
+  /* 手機上兩欄各只剩 150px 左右,中文標題會被擠成一行兩個字 —— 直接改成上下排 */
+  @media (max-width: 520px) {
+    .pager {
+      grid-template-columns: 1fr;
+    }
+    .pager-link.next {
+      text-align: left;
+    }
+  }
+  .pager-label {
+    font-size: var(--text-xs);
+  }
+  .pager-title {
+    font-size: var(--text-sm);
+    font-weight: 600;
   }
 </style>

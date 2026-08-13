@@ -1,0 +1,58 @@
+---
+// 目標清單的單列 —— 首頁與 /goals/ 共用同一份 markup。
+import StatusBadge from './StatusBadge.astro';
+import { formatMonth } from '../lib/format';
+import type { Goal } from '../lib/goals';
+
+interface Props {
+  goal: Goal;
+  /** 首頁那份不顯示 target date,版面才不會太擠 */
+  showTarget?: boolean;
+}
+const { goal, showTarget = true } = Astro.props;
+const done = goal.data.status === 'done';
+---
+
+<li>
+  <a href={`/goals/${goal.id}/`} class:list={['row-link', { done }]}>
+    <StatusBadge status={goal.data.status} />
+    <span class="body">
+      <span class="text">{goal.data.title}</span>
+      {
+        showTarget && goal.data.target_date && (
+          <span class="muted target">目標日期:{formatMonth(goal.data.target_date)}</span>
+        )
+      }
+    </span>
+    <span class="arrow" aria-hidden="true">→</span>
+  </a>
+</li>
+
+<style>
+  /* 橫條是 align-items: flex-start,徽章要往下推一點才跟第一行文字對齊 */
+  .row-link :global(.badge) {
+    margin-top: 0.2rem;
+  }
+  .body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    flex: 1;
+    min-width: 0;
+  }
+  .done .text {
+    text-decoration: line-through;
+    color: var(--text-soft);
+  }
+  .target {
+    font-size: var(--text-xs);
+  }
+  .arrow {
+    color: var(--text-soft);
+    transition: transform var(--transition-base), color var(--transition-base);
+  }
+  .row-link:hover .arrow {
+    color: var(--accent);
+    transform: translateX(3px);
+  }
+</style>

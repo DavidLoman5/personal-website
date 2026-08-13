@@ -1,50 +1,39 @@
 ---
 // 文章 / 作品的卡片
+import TagList from './TagList.astro';
+import MetaLine from './MetaLine.astro';
+
 interface Props {
   href: string;
   title: string;
   date?: Date;
   summary?: string;
   tags?: string[];
+  /** 幾分鐘讀完;沒給就不顯示 */
+  minutes?: number;
 }
-const { href, title, date, summary, tags = [] } = Astro.props;
-
-const dateStr = date
-  ? date.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' })
-  : '';
+const { href, title, date, summary, tags = [], minutes } = Astro.props;
 ---
 
-<a href={href} class="card post-card">
-  <h3>{title}</h3>
-  {dateStr && <time class="muted date">{dateStr}</time>}
+{/* 標籤本身是連結,所以整張卡不能再包一層 <a> —— 改用 .card-title 的
+    ::after 撐開整張卡的點擊範圍(定義在 global.css) */}
+<article class="card post-card">
+  <h2 class="card-title title"><a href={href}>{title}</a></h2>
+  <MetaLine date={date} minutes={minutes} />
   {summary && <p class="summary">{summary}</p>}
-  {
-    tags.length > 0 && (
-      <div class="tags">
-        {tags.map((t) => (
-          <span class="tag">#{t}</span>
-        ))}
-      </div>
-    )
-  }
-</a>
+  <TagList tags={tags} />
+</article>
 
 <style>
-  .post-card h3 {
-    margin: 0 0 0.2rem;
-    color: var(--text);
+  .title {
+    font-size: var(--text-xl);
   }
-  .date {
-    font-size: 0.85rem;
+  /* .meta 是 MetaLine 產生的,不帶這個元件的 scope,要用 :global() 才選得到 */
+  .post-card :global(.meta) {
+    margin-top: var(--space-1);
   }
   .summary {
-    margin: 0.6rem 0 0;
+    margin: var(--space-3) 0 0;
     color: var(--text-soft);
-  }
-  .tags {
-    margin-top: 0.8rem;
-    display: flex;
-    gap: 0.4rem;
-    flex-wrap: wrap;
   }
 </style>

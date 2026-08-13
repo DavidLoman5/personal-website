@@ -1,0 +1,35 @@
+---
+// 標籤列。以前標籤只是 <span>,看得到卻點不動 —— 現在每個都連到標籤頁。
+// 網址一律走 tagSlug(),跟 /tags/[tag].astro 產出的路徑用同一套規則。
+import { tagSlug } from '../lib/content';
+
+interface Props {
+  tags?: string[];
+  class?: string;
+}
+const { tags = [], class: className } = Astro.props;
+---
+
+{
+  tags.length > 0 && (
+    <div class:list={['tags', className]}>
+      {tags.map((t) => (
+        <a class="tag" href={`/tags/${encodeURIComponent(tagSlug(t))}/`}>
+          #{t}
+        </a>
+      ))}
+    </div>
+  )
+}
+
+<style>
+  .tags {
+    margin-top: var(--space-3);
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    /* 卡片整張可點時,標籤要浮在覆蓋層之上才點得到自己的連結 */
+    position: relative;
+    z-index: 1;
+  }
+</style>

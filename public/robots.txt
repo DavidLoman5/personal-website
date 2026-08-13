@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# 後台不需要被索引;config.yml 會把 repo 名稱與所有欄位結構攤在外面
+Disallow: /admin/
+
+Sitemap: https://davidloman.netlify.app/sitemap-index.xml

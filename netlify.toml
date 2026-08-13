@@ -6,7 +6,7 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# 注意:網址是 /about 而不是 /about/index.html,所以規則要寫 /* 才吃得到。
+# 網址是 /about/ 而不是 /about/index.html,所以規則要寫 /* 才吃得到。
 # max-age=30 是刻意的 —— 預抓回來的頁面如果是 max-age=0,點下去瀏覽器還是要回源
 # 問一次「有沒有更新」(304),預抓就白做了。給 30 秒的新鮮期,點擊才是真正的零等待;
 # 代價是從 /admin 發文後最多 30 秒才會看到,重新整理則會立刻拿到新的。
@@ -16,6 +16,8 @@
     Cache-Control = "public, max-age=30, must-revalidate"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
 
 # 檔名帶 hash,可以永久快取
 [[headers]]
@@ -29,8 +31,56 @@
   [headers.values]
     Cache-Control = "public, max-age=86400"
 
+# RSS 與 sitemap 不需要 30 秒就過期,爬蟲本來就不會一直來
+[[headers]]
+  for = "/*.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+# 分享預覽圖:各家社群平台會自己抓一次存起來,給長一點的快取
+[[headers]]
+  for = "/og.png"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
 # 後台設定改了要立刻生效
 [[headers]]
   for = "/admin/*"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
+
+# ── 舊網址轉址 ────────────────────────────────────────────────
+# 內容的檔名就是網址。改檔名等於換網址,舊連結會斷,所以每次改檔名都要在這裡
+# 補一條 301。from 不寫結尾斜線,Netlify 會同時吃到有斜線與沒斜線兩種寫法;
+# 舊路徑已經沒有對應的檔案了,所以不需要 force。
+# 中文路徑要寫成百分號編碼(瀏覽器實際送出的就是編碼後的樣子),
+# 每條上面用註解標出原本的中文,不然之後沒人看得懂那串是什麼。
+
+# 目標的檔名在 2026-08 從中文/不精確的名稱改成英文 slug
+[[redirects]]
+  from = "/goals/long-term"
+  to = "/goals/toefl/"
+  status = 301
+
+[[redirects]]
+  from = "/goals/read-books"
+  to = "/goals/read-gpe/"
+  status = 301
+
+# /goals/加入sdc社團並學習
+[[redirects]]
+  from = "/goals/%E5%8A%A0%E5%85%A5sdc%E7%A4%BE%E5%9C%98%E4%B8%A6%E5%AD%B8%E7%BF%92"
+  to = "/goals/summer-lab-abroad/"
+  status = 301
+
+# /goals/進實驗室
+[[redirects]]
+  from = "/goals/%E9%80%B2%E5%AF%A6%E9%A9%97%E5%AE%A4"
+  to = "/goals/liu-lab/"
+  status = 301
+
+# /goals/錄取國外頂尖實驗室
+[[redirects]]
+  from = "/goals/%E9%8C%84%E5%8F%96%E5%9C%8B%E5%A4%96%E9%A0%82%E5%B0%96%E5%AF%A6%E9%A9%97%E5%AE%A4"
+  to = "/goals/top-lab-abroad/"
+  status = 301

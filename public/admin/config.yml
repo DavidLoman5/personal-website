@@ -37,6 +37,13 @@ collections:
       - { name: summary, label: 摘要, widget: text, required: false, hint: 顯示在列表上的一兩句話 }
       - { name: tags, label: 標籤, widget: list, required: false, default: [] }
       - { name: cover, label: 封面圖, widget: image, required: false }
+      - {
+          name: cover_alt,
+          label: 封面圖說明,
+          widget: string,
+          required: false,
+          hint: 給看不到圖的人聽的一句描述；留空就當純裝飾圖,
+        }
       - { name: draft, label: 草稿（勾選則不公開）, widget: boolean, default: false }
       - { name: body, label: 內文, widget: markdown }
 
@@ -82,6 +89,7 @@ collections:
           date_format: 'YYYY-MM-DD',
           time_format: false,
         }
+      - { name: draft, label: 草稿（勾選則不公開）, widget: boolean, default: false }
       - { name: body, label: 說明, widget: markdown, required: false }
 
   # ---------- 作品 / Projects ----------
@@ -104,8 +112,22 @@ collections:
       - { name: summary, label: 簡介, widget: text, required: false }
       - { name: tags, label: 標籤, widget: list, required: false, default: [] }
       - { name: cover, label: 封面圖, widget: image, required: false }
-      - { name: link, label: 連結（選填）, widget: string, required: false }
+      - {
+          name: cover_alt,
+          label: 封面圖說明,
+          widget: string,
+          required: false,
+          hint: 給看不到圖的人聽的一句描述；留空就當純裝飾圖,
+        }
+      - {
+          name: link,
+          label: 外部連結（選填）,
+          widget: string,
+          required: false,
+          pattern: ['^https?://.+', '要填完整網址，開頭要有 https://'],
+        }
       - { name: order, label: 排序（數字小的在前）, widget: number, default: 0, value_type: int }
+      - { name: draft, label: 草稿（勾選則不公開）, widget: boolean, default: false }
       - { name: body, label: 說明, widget: markdown, required: false }
 
   # ---------- 單一頁面（首頁封面、關於我） ----------

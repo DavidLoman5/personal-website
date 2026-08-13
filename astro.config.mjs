@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
 
 // 部署後把 site 換成你的正式網址(例如 Netlify 給的 https://xxx.netlify.app)
 // 這會讓 RSS、canonical 連結等使用正確的網域。
@@ -13,11 +14,13 @@ export default defineConfig({
     prefetchAll: true,
     defaultStrategy: 'viewport',
   },
-  // CSS 只有 ~5KB,直接內嵌進 HTML,省掉一次會擋住首次繪製的請求
-  // (預設 'auto' 超過 4KB 就會externalize,剛好被我們新增的樣式推過門檻)
+  // 樣式加了設計系統之後已經超過 10KB,再全部內嵌就是「每一頁都重載一次同樣的 CSS、
+  // 而且一次都快取不到」。改回 'auto':大的抽成 /_astro/*.css(netlify.toml 給它一年
+  // immutable 快取,第二頁起完全免費),小的仍然內嵌。
   build: {
-    inlineStylesheets: 'always',
+    inlineStylesheets: 'auto',
   },
+  integrations: [sitemap()],
   markdown: {
     shikiConfig: {
       themes: {

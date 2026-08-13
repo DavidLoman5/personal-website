@@ -7,19 +7,20 @@ const path = Astro.url.pathname;
 function isActive(href: string) {
   if (href === '/') return path === '/';
   // href 已帶結尾斜線(如 /goals/),所以 startsWith 就能同時涵蓋列表頁與其下的詳情頁
-  return path === href || path.startsWith(href);
+  return path.startsWith(href);
 }
 ---
 
 <header>
-  <div class="container inner">
+  <div class="container container-wide inner">
     <a href="/" class="brand">{SITE.title}</a>
-    <nav>
+    <nav aria-label="主導覽">
+      {/* class 用 undefined 而不是空字串,沒選中的連結才不會留下一個沒用的 class="" */}
       {
         NAV_LINKS.map((link) => (
           <a
             href={link.href}
-            class={isActive(link.href) ? 'active' : ''}
+            class={isActive(link.href) ? 'active' : undefined}
             aria-current={isActive(link.href) ? 'page' : undefined}
           >
             {link.label}
@@ -34,22 +35,33 @@ function isActive(href: string) {
 <style>
   header {
     border-bottom: 1px solid var(--border);
-    background: var(--bg);
     position: sticky;
     top: 0;
     z-index: 10;
+    /* 半透明毛玻璃 —— 內容從底下捲過去時才有層次 */
+    background: color-mix(in srgb, var(--bg) 78%, transparent);
+    backdrop-filter: blur(12px) saturate(1.6);
+    -webkit-backdrop-filter: blur(12px) saturate(1.6);
   }
+  /* 不支援毛玻璃(或 color-mix)的瀏覽器要退回不透明,否則文字會直接疊在內容上 */
+  @supports not ((backdrop-filter: blur(1px)) and (background: color-mix(in srgb, red 50%, blue))) {
+    header {
+      background: var(--bg);
+    }
+  }
+
   .inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    min-height: 60px;
+    gap: var(--space-4);
+    min-height: var(--header-h);
     flex-wrap: wrap;
   }
   .brand {
     font-weight: 700;
-    font-size: 1.05rem;
+    font-size: var(--text-base);
+    letter-spacing: -0.02em;
     color: var(--text);
   }
   .brand:hover {
@@ -59,18 +71,20 @@ function isActive(href: string) {
   nav {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: var(--space-1);
     flex-wrap: wrap;
   }
   nav a {
+    position: relative;
     color: var(--text-soft);
     /* 至少 44px 的點擊範圍,避免在手機上誤觸 */
     display: inline-flex;
     align-items: center;
     min-height: 44px;
-    padding: 0.55rem 0.7rem;
-    border-radius: 8px;
-    font-size: 0.95rem;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
+    transition: color var(--transition-fast), background var(--transition-fast);
   }
   nav a:hover {
     color: var(--text);
@@ -82,7 +96,18 @@ function isActive(href: string) {
     background: var(--bg-soft);
   }
   nav a.active {
-    color: var(--accent);
+    color: var(--text);
     font-weight: 600;
+  }
+  /* 目前頁面的漸層底線 */
+  nav a.active::after {
+    content: '';
+    position: absolute;
+    left: var(--space-3);
+    right: var(--space-3);
+    bottom: 6px;
+    height: 2px;
+    border-radius: var(--radius-full);
+    background: var(--grad);
   }
 </style>

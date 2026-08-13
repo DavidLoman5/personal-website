@@ -1,0 +1,36 @@
+---
+// 目標狀態的小徽章。以前這段 CSS 在三個檔案各寫一份,連 padding 都對不起來。
+import { STATUS_LABEL, type GoalStatus } from '../lib/goals';
+
+interface Props {
+  status: GoalStatus;
+}
+const { status } = Astro.props;
+---
+
+<span class={`badge badge-${status}`}>{STATUS_LABEL[status]}</span>
+
+<style>
+  .badge {
+    display: inline-block;
+    font-size: var(--text-xs);
+    line-height: 1.6;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-full);
+    white-space: nowrap;
+    font-weight: 600;
+  }
+  /* 底色與前景色成對來自 token,深淺主題各有一組,兩邊都過 AA 4.5:1 */
+  .badge-todo {
+    background: var(--status-todo);
+    color: var(--status-todo-fg);
+  }
+  .badge-doing {
+    background: var(--status-doing);
+    color: var(--status-doing-fg);
+  }
+  .badge-done {
+    background: var(--status-done);
+    color: var(--status-done-fg);
+  }
+</style>

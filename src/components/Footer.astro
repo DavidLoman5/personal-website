@@ -4,11 +4,14 @@ const year = new Date().getFullYear();
 ---
 
 <footer>
-  <div class="container inner">
+  {/* 頁首頁尾一律用寬版容器,內文變窄時整個站的外框才不會跟著縮 */}
+  <div class="container container-wide inner">
     <span class="muted">© {year} {SITE.author}</span>
     <span class="links">
+      <a href="/tags/">Tags</a>
       {SITE.github && <a href={SITE.github} target="_blank" rel="noopener">GitHub</a>}
       {SITE.email && <a href={`mailto:${SITE.email}`}>Email</a>}
+      <a href="/rss.xml">RSS</a>
     </span>
   </div>
 </footer>
@@ -16,19 +19,19 @@ const year = new Date().getFullYear();
 <style>
   footer {
     border-top: 1px solid var(--border);
-    margin-top: 4rem;
-    padding: 1.5rem 0;
-    font-size: 0.9rem;
+    margin-top: var(--space-9);
+    padding: var(--space-5) 0;
+    font-size: var(--text-sm);
   }
   .inner {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
+    gap: var(--space-4);
     flex-wrap: wrap;
   }
   .links {
     display: flex;
-    gap: 1rem;
+    gap: var(--space-4);
   }
 </style>
