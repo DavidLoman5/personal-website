@@ -63,13 +63,6 @@ const ogImage = new URL(image || SITE.ogImage, Astro.site);
     <meta name="twitter:description" content={pageDesc} />
     <meta name="twitter:image" content={ogImage} />
 
-    <link
-      rel="alternate"
-      type="application/rss+xml"
-      title={`${SITE.title} — Blog`}
-      href={new URL('/rss.xml', Astro.site)}
-    />
-
     <ClientRouter />
 
     <!-- 在頁面繪製前先套用主題,避免深色模式閃爍 -->

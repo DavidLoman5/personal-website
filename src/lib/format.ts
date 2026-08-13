@@ -28,20 +28,3 @@ export function formatMonth(date: Date): string {
 export function isoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
-
-/**
- * 粗估閱讀時間。中文按字數算(每分鐘約 350 字),英文按單字數(每分鐘約 220 字);
- * 中英混排就兩邊相加,不會因為中文沒有空格而被算成「一個字」。
- */
-export function readingTime(body: string | undefined): number {
-  const text = (body ?? '')
-    .replace(/```[\s\S]*?```/g, '') // 程式碼區塊不算
-    .replace(/!?\[[^\]]*\]\([^)]*\)/g, '') // 連結與圖片語法
-    .replace(/[#>*_`~-]/g, '');
-
-  const cjk = (text.match(/[一-鿿぀-ヿ]/g) ?? []).length;
-  const words = (text.replace(/[一-鿿぀-ヿ]/g, ' ').match(/[A-Za-z0-9]+/g) ?? [])
-    .length;
-
-  return Math.max(1, Math.round(cjk / 350 + words / 220));
-}

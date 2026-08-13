@@ -21,7 +21,6 @@ interface Props {
    * 兩個欄位綁在同一個物件裡 —— 拆成兩個選填欄位時,只填一個編輯鈕會靜默消失。
    */
   edit?: { collection: CmsCollection; entry: string };
-  minutes?: number;
   /** 已完成的目標,標題要劃掉 */
   strike?: boolean;
   prev?: { href: string; title: string };
@@ -36,7 +35,6 @@ const {
   coverAlt,
   back,
   edit,
-  minutes,
   strike = false,
   prev,
   next,
@@ -60,7 +58,7 @@ const {
 
     <h1 class:list={['title', { strike }]}>{title}</h1>
 
-    <MetaLine date={date} minutes={minutes} />
+    <MetaLine date={date} />
 
     {/* goals 詳情頁用這個插槽放期程與狀態徽章 */}
     <div class="extra-meta"><slot name="meta" /></div>

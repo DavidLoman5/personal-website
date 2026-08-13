@@ -31,7 +31,7 @@
   [headers.values]
     Cache-Control = "public, max-age=86400"
 
-# RSS 與 sitemap 不需要 30 秒就過期,爬蟲本來就不會一直來
+# sitemap 不需要 30 秒就過期,爬蟲本來就不會一直來
 [[headers]]
   for = "/*.xml"
   [headers.values]

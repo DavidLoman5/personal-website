@@ -2,7 +2,6 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import { getTagMap, type TaggedEntry } from '../../lib/content';
-import { readingTime } from '../../lib/format';
 
 export async function getStaticPaths() {
   const tagMap = await getTagMap();
@@ -45,7 +44,6 @@ const sorted = [...items].sort(
           date={entry.data.date}
           summary={entry.data.summary}
           tags={entry.data.tags}
-          minutes={kind === 'post' ? readingTime(entry.body) : undefined}
         />
       ))
     }

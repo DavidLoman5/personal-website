@@ -3,7 +3,6 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import EditButton from '../../components/EditButton.astro';
 import { getPosts } from '../../lib/content';
-import { readingTime } from '../../lib/format';
 
 const posts = await getPosts();
 ---
@@ -13,7 +12,6 @@ const posts = await getPosts();
     <h1 class="page-title">Blog</h1>
     <EditButton collection="blog" label="心得" />
   </div>
-  <p class="page-intro">我的筆記、想法與紀錄。</p>
 
   {
     posts.length > 0 ? (
@@ -26,7 +24,6 @@ const posts = await getPosts();
               date={p.data.date}
               summary={p.data.summary}
               tags={p.data.tags}
-              minutes={readingTime(p.body)}
             />
           </div>
         ))}

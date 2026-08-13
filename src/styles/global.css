@@ -52,24 +52,28 @@
   --text-soft: #5b6072;
   --border: #e2e4ee;
 
-  --accent: #4f46e5;
-  --accent-2: #0891b2;
-  --accent-hover: #4338ca;
+  --accent: #2f6f4f;
+  --accent-2: #0f766e;
+  --accent-hover: #245a3f;
   /* 半透明的強調色 —— 用在光暈、hover 底色,不要直接對 --accent 開 opacity,
      那會連帶把上面的文字一起變淡 */
-  --accent-wash: rgba(79, 70, 229, 0.09);
+  --accent-wash: rgba(47, 111, 79, 0.09);
 
   --shadow: 0 1px 3px rgba(20, 22, 28, 0.06), 0 1px 2px rgba(20, 22, 28, 0.04);
   --shadow-lg: 0 12px 32px -8px rgba(20, 22, 28, 0.14);
 
   /* 狀態色:底色 + 對應的前景色成對定義。
-     淺色主題用深底白字,才過得了 WCAG AA 4.5:1(badge 字級只有 12px,算一般文字)。 */
+     淺色主題用深底白字,才過得了 WCAG AA 4.5:1(badge 字級只有 12px,算一般文字)。
+     例外是 done —— 主色改綠之後,doing 與 done 都是綠的。白字要過 AA,底色亮度
+     必須夠低,而那個區間裡的綠全是深綠,兩個狀態根本拉不開。所以 done 反過來
+     用淺薄荷底 + 深綠字:對比 6.78:1 一樣過 AA,而且語意也對(進行中實心搶眼,
+     已完成淡色沉下去)。 */
   --status-todo: #5b6472;
   --status-todo-fg: #ffffff;
-  --status-doing: #4f46e5;
+  --status-doing: #2f6f4f;
   --status-doing-fg: #ffffff;
-  --status-done: #15803d;
-  --status-done-fg: #ffffff;
+  --status-done: #d1fae5;
+  --status-done-fg: #065f46;
 
   color-scheme: light;
 }
@@ -83,22 +87,26 @@
   --text-soft: #9aa1b8;
   --border: #262b3a;
 
-  --accent: #818cf8;
-  --accent-2: #22d3ee;
-  --accent-hover: #a5b4fc;
-  --accent-wash: rgba(129, 140, 248, 0.14);
+  --accent: #6bbf8f;
+  --accent-2: #2dd4bf;
+  --accent-hover: #85cfa4;
+  --accent-wash: rgba(107, 191, 143, 0.14);
 
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 12px 32px -8px rgba(0, 0, 0, 0.6);
 
   /* 深色主題反過來:亮底深字。同樣的色票在深色底上如果沿用白字,
      對比只有 2 點多,完全不合格。 */
+  /* done 同樣走「淡色沉下去」那一套,只是深淺主題方向相反:
+     進行中永遠是對比最強的那顆(淺色主題深底、深色主題亮底),已完成永遠貼近背景。
+     兩顆都留在綠色系,靠明暗拉開 —— 深色主題若讓兩顆都是亮綠,亮度差只有 1.27:1,
+     幾乎分不出來。 */
   --status-todo: #94a3b8;
   --status-todo-fg: #0d0f16;
-  --status-doing: #818cf8;
+  --status-doing: #6bbf8f;
   --status-doing-fg: #0d0f16;
-  --status-done: #4ade80;
-  --status-done-fg: #0d0f16;
+  --status-done: #14532d;
+  --status-done-fg: #86efac;
 
   color-scheme: dark;
 }
@@ -230,13 +238,18 @@ blockquote {
 /* ── 共用元件 ─────────────────────────────────────────────── */
 
 .tag {
-  display: inline-block;
+  /* 用 inline-flex + min-height 撐出 32px 的點擊範圍 —— 原本只有 22px,
+     低於 WCAG 2.2 AA 的 24×24。不追到 44px 是因為標籤出現在每張卡片上,
+     再高會讓卡片明顯變胖(tags 首頁那種獨立的 .tag-chip 才給 40px)。 */
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
   font-size: var(--text-xs);
   color: var(--text-soft);
   background: var(--bg-soft);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
-  padding: 0.1rem var(--space-3);
+  padding: 0 var(--space-3);
   transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 a.tag:hover {
@@ -407,7 +420,12 @@ a.tag:hover {
 
 .page-title {
   font-size: var(--text-3xl);
-  margin: var(--space-7) 0 var(--space-1);
+  margin: var(--space-7) 0 var(--space-6);
+}
+/* 後面接著介紹句時,標題要跟它靠在一起 —— 下方間距改由介紹句負責。
+   不支援 :has() 的瀏覽器只會多一點空隙,不會壞版。 */
+.page-title:has(+ .page-intro) {
+  margin-bottom: var(--space-1);
 }
 .page-intro {
   color: var(--text-soft);
@@ -516,14 +534,18 @@ a.tag:hover {
     }
   }
 }
+/* 位移刻意用獨立的 translate 屬性,不用 transform —— 動畫的優先序高於一般宣告,
+   `.reveal` 直接掛在 .card 上時(作品頁就是),結束幀的 transform 會把
+   `.card:hover` 的 translateY 整個蓋掉,卡片就不會浮起來。translate 與 transform
+   是分開合成的,兩者可以並存。 */
 @keyframes reveal-in {
   from {
     opacity: 0;
-    transform: translateY(14px);
+    translate: 0 14px;
   }
   to {
     opacity: 1;
-    transform: none;
+    translate: none;
   }
 }
 
@@ -543,5 +565,6 @@ a.tag:hover {
     animation: none;
     opacity: 1;
     transform: none;
+    translate: none;
   }
 }

@@ -27,10 +27,3 @@ export function sortGoals(goals: Goal[]): Goal[] {
       a.data.title.localeCompare(b.data.title, 'zh-Hant'),
   );
 }
-
-/** 完成度 —— 首頁的進度條用 */
-export function goalProgress(goals: Goal[]) {
-  const total = goals.length;
-  const done = goals.filter((g) => g.data.status === 'done').length;
-  return { done, total, percent: total === 0 ? 0 : Math.round((done / total) * 100) };
-}

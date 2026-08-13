@@ -2,7 +2,6 @@
 import { render } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
 import { getPosts } from '../../lib/content';
-import { readingTime } from '../../lib/format';
 
 export async function getStaticPaths() {
   // 已經是新到舊排序,直接拿相鄰的兩篇當上一篇/下一篇
@@ -34,7 +33,6 @@ const link = (p?: typeof post) =>
   coverAlt={post.data.cover_alt}
   back={{ href: '/blog/', label: 'Blog' }}
   edit={{ collection: 'blog', entry: post.id }}
-  minutes={readingTime(post.body)}
   prev={link(older)}
   next={link(newer)}
 >

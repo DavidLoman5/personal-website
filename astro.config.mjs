@@ -3,7 +3,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 // 部署後把 site 換成你的正式網址(例如 Netlify 給的 https://xxx.netlify.app)
-// 這會讓 RSS、canonical 連結等使用正確的網域。
+// 這會讓 canonical 連結、sitemap、OG 網址等使用正確的網域。
 export default defineConfig({
   site: 'https://davidloman.netlify.app',
   // 頁面實際位置是 /goals/,連結若寫 /goals 每次點擊都要先吃一次 301 轉址。

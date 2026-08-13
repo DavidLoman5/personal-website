@@ -9,17 +9,15 @@ interface Props {
   date?: Date;
   summary?: string;
   tags?: string[];
-  /** 幾分鐘讀完;沒給就不顯示 */
-  minutes?: number;
 }
-const { href, title, date, summary, tags = [], minutes } = Astro.props;
+const { href, title, date, summary, tags = [] } = Astro.props;
 ---
 
 {/* 標籤本身是連結,所以整張卡不能再包一層 <a> —— 改用 .card-title 的
     ::after 撐開整張卡的點擊範圍(定義在 global.css) */}
 <article class="card post-card">
   <h2 class="card-title title"><a href={href}>{title}</a></h2>
-  <MetaLine date={date} minutes={minutes} />
+  <MetaLine date={date} />
   {summary && <p class="summary">{summary}</p>}
   <TagList tags={tags} />
 </article>
